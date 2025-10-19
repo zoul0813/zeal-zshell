@@ -1,0 +1,13 @@
+.TH zshell 1 "18 Oct 2025" zshell "zshell manual"
+.SH NAME
+zshell \- Short description of the project
+.SH SYNOPSIS
+zshell
+.SH DESCRIPTION
+Short description of the project
+.SH OPTIONS
+
+.SH SEE ALSO
+
+.SH BUGS
+No known bugs.
