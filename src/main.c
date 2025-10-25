@@ -7,25 +7,70 @@
 #include <keyboard.h>
 #include <ansi.h>
 
+#include "history.h"
+
+#define STATUS_OK   0
+#define STATUS_EXIT 1
+
 // PATH_MAX = 128
 // FILENAME_LEN_MAX = 16
-#define BUFFER_SIZE 256
-static unsigned char buffer[BUFFER_SIZE];
+static unsigned char buffer[COMMAND_MAX];
 static uint8_t pos = 0;
 static uint16_t size;
+static uint8_t status;
+
+static History history;
+static HistoryNode *history_node;
+
+const char *ERROR_STRINGS[] = {
+    "ERR_SUCCESS",
+    "ERR_FAILURE",
+    "ERR_NOT_IMPLEMENTED",
+    "ERR_NOT_SUPPORTED",
+    "ERR_NO_SUCH_ENTRY",
+    "ERR_INVALID_SYSCALL",
+    "ERR_INVALID_PARAMETER",
+    "ERR_INVALID_VIRT_PAGE",
+    "ERR_INVALID_PHYS_ADDRESS",
+    "ERR_INVALID_OFFSET",
+    "ERR_INVALID_NAME",
+    "ERR_INVALID_PATH",
+    "ERR_INVALID_FILESYSTEM",
+    "ERR_INVALID_FILEDEV",
+    "ERR_PATH_TOO_LONG",
+    "ERR_ALREADY_EXIST",
+    "ERR_ALREADY_OPENED",
+    "ERR_ALREADY_MOUNTED",
+    "ERR_READ_ONLY",
+    "ERR_BAD_MODE",
+    "ERR_CANNOT_REGISTER_MORE",
+    "ERR_NO_MORE_ENTRIES",
+    "ERR_NO_MORE_MEMORY",
+    "ERR_NOT_A_DIR",
+    "ERR_NOT_A_FILE",
+    "ERR_ENTRY_CORRUPTED",
+    "ERR_DIR_NOT_EMPTY",
+    "INVALID_ERROR_CODE",
+};
+const uint8_t ERROR_STRINGS_LEN = sizeof(ERROR_STRINGS) / sizeof(ERROR_STRINGS[0]);
 
 int fflush_stdout(void); // defined in ZOS
 
 int __exit(zos_err_t err) {
-  if(err == ERR_SUCCESS) err = ioctl(DEV_STDOUT, CMD_RESET_SCREEN, NULL);
+//   if(err == ERR_SUCCESS) err = ioctl(DEV_STDOUT, CMD_RESET_SCREEN, NULL);
   exit(err);
   return err;
 }
 
+void print_error(uint8_t code) {
+    if(code >= ERROR_STRINGS_LEN) code = ERROR_STRINGS_LEN-1;
+    printf("ERROR($%02x): %s\n", code, ERROR_STRINGS[code]);
+}
+
 void handle_error(zos_err_t err, char *msg, uint8_t fatal) {
   if(err != ERR_SUCCESS) {
-    // cursor_xy(2,20); // why does ZMT move the cursor???
-    printf("failed to %s, %d (%02x)\n", msg, err, err);
+    printf("failed to %s, ", msg);
+    print_error(err);
     if(fatal) __exit(err);
   }
 }
@@ -66,10 +111,29 @@ zos_err_t find_exec(unsigned char *name) {
     return ERR_NO_SUCH_ENTRY;
 }
 
-zos_err_t run(unsigned char *b) {
+void clear_command(void) {
+    printf("\r");
+    for(uint8_t i = 0; i < pos+4; i++) {
+        printf(" ");
+    }
+    buffer[0] = '\0';
+    pos = 0;
+    fflush_stdout();
+}
+
+void use_history(HistoryNode *node) {
+    if(!node) return;
+    clear_command();
+    printf("\r> %s", node->str);
+    fflush_stdout();
+    strncpy(buffer, node->str, COMMAND_MAX - 1);
+    buffer[COMMAND_MAX - 1] = '\0';
+    pos = strlen(buffer);
+}
+
+zos_err_t run(unsigned char *b, uint8_t* s) {
+    *s = STATUS_OK;
     zos_err_t err;
-    b[pos] = '\0';
-    // printf("PARSING: %s\n", b);
 
     uint16_t l = strlen(b);
 
@@ -98,6 +162,21 @@ zos_err_t run(unsigned char *b) {
         }
     }
 
+    if(strcmp(cmd, "exit") == 0) {
+        return __exit(ERR_SUCCESS);
+    }
+    if(strcmp(cmd, "history") == 0) {
+        HistoryNode *node = history.tail;
+        while(node) {
+            printf("  %s\n", node->str);
+            node = node->prev;
+        }
+        return 0;
+    }
+    if(strcmp(cmd, "clear") == 0) {
+        return ioctl(DEV_STDOUT, CMD_RESET_SCREEN, NULL);
+    }
+
     // printf("CMD: %s\n", cmd);
     // printf("ARGS: %s\n", args);
 
@@ -112,7 +191,8 @@ zos_err_t run(unsigned char *b) {
     uint8_t retval;
     err = exec(EXEC_PRESERVE_PROGRAM, cmd, &argv, &retval);
     if(!err && retval > 0) {
-        printf("Returned %02x\n", retval);
+        printf("Returned ");
+        print_error(retval);
     }
 
 do_return:
@@ -122,6 +202,9 @@ do_return:
 int main(int argc, char **argv) {
     (void*)argc;
     (void*)argv;
+
+    history_init(&history);
+    history_node = NULL;
 
     zos_err_t err = kb_mode_non_block_raw();
     handle_error(err, "init keyboard", 1);
@@ -133,30 +216,66 @@ int main(int argc, char **argv) {
             kb_keys_t key = getkey();
             if(key == 0) continue;
             switch(key) {
-                case KB_END:
+                case KB_END: {
                     goto quit;
-                case KB_KEY_ENTER:
-                    printf("\n");
-                    err = run(buffer);
-                    if(err) {
-                        printf("ERROR: %02x\n", err);
+                }
+
+                // History navigation
+                case KB_UP_ARROW: {
+                    if(!history_node) {
+                        history_node = history.tail;
+                    } else {
+                        history_node = history_node->prev;
+                        if(!history_node) history_node = history.tail;
                     }
+                    use_history(history_node);
+
+                } break;
+                case KB_DOWN_ARROW: {
+                    if(!history_node) {
+                        history_node = history.head;
+                    } else {
+                        history_node = history_node->next;
+                        if(!history_node) history_node = history.head;
+                    }
+                    use_history(history_node);
+                } break;
+                case KB_ESC: {
+                    history_node = NULL;
+                    clear_command();
+                    printf("\r> ");
+                    fflush_stdout();
+                } break;
+
+                case KB_KEY_ENTER: {
+                    buffer[pos] = '\0';
+                    history_add(&history, buffer);
+                    history_node = history.tail;
+
+                    printf("\n");
+                    err = run(buffer, &status);
+                    if(err) print_error(err);
+
                     buffer[0] = '\0';
                     pos = 0;
-                    goto end_outer_loop;
+                } goto end_outer_loop;
                 case KB_KEY_BACKSPACE: {
-                    buffer[pos] = '\0';
+                    if(pos == 0) break;
                     pos--;
+                    buffer[pos] = '\0';
                     uint8_t x                = zvb_peri_text_curs_x - 1;
                     zvb_peri_text_curs_x     = x;
                     zvb_peri_text_print_char = '\0';
                     zvb_peri_text_curs_x     = x;
                 } break;
-                default:
+                default: {
+                    if(pos > COMMAND_MAX - 1) break;
                     unsigned char c = getch(key);
+                    if(c < 0x20 || c > 0x7D) break; // unprintable
                     buffer[pos++] = c;
                     printf("%c", c);
                     fflush_stdout();
+                } break;
             }
         }
 end_outer_loop:

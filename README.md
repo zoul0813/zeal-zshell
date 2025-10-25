@@ -1,6 +1,6 @@
-# zshell
+# ZShell
 
-Short description of the project
+A new shell for Zeal 8-bit OS, with history and a few other extras.
 
 ## Installation
 
@@ -11,7 +11,5 @@ Make sure that you have [ZDE](https://github.com/zoul0813/zeal-dev-environment) 
 Then open a terminal, go to the source directory and type the following commands:
 
 ```shell
-    $ zde create zealos-sdcc name={project}
-    $ cd {project}
-    $ zde cmake
+zde cmake
 ```

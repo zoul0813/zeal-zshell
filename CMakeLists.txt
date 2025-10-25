@@ -14,7 +14,10 @@ find_package(ZVB_SDK REQUIRED)
 # When using CMake as a build system, it's possible to mix ASM and C in the compilation
 project(zshell C ASM)
 
-add_executable(zshell "src/main.c")
+add_executable(zshell
+    "src/main.c"
+    "src/history.c"
+)
 
 target_include_directories(zshell PRIVATE $ENV{ZVB_SDK_PATH}/include)
 target_include_directories(zshell PRIVATE ${CMAKE_CURRENT_LIST_DIR}/include)
