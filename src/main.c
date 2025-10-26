@@ -162,6 +162,16 @@ zos_err_t run(unsigned char *b, uint8_t* s) {
         }
     }
 
+    if(strcmp(cmd, "cd") == 0) {
+        return chdir(args);
+    }
+    if(strcmp(cmd, "pwd") == 0) {
+        err = curdir(buffer);
+        handle_error(err, "Failed", 1);
+        printf("%s\n", buffer);
+        buffer[0] = '\0';
+        return ERR_SUCCESS;
+    }
     if(strcmp(cmd, "exit") == 0) {
         return __exit(ERR_SUCCESS);
     }
