@@ -17,6 +17,7 @@ project(zshell C ASM)
 add_executable(zshell
     "src/main.c"
     "src/history.c"
+    "src/paths.c"
 )
 
 target_include_directories(zshell PRIVATE $ENV{ZVB_SDK_PATH}/include)

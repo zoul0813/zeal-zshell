@@ -8,6 +8,7 @@
 #include <ansi.h>
 
 #include "history.h"
+#include "paths.h"
 
 #define STATUS_OK   0
 #define STATUS_EXIT 1
@@ -15,6 +16,7 @@
 // PATH_MAX = 128
 // FILENAME_LEN_MAX = 16
 static unsigned char buffer[COMMAND_MAX];
+dir_t cwd;
 static uint8_t pos = 0;
 static uint16_t size;
 static uint8_t status;
@@ -67,9 +69,19 @@ void print_error(uint8_t code) {
     printf("ERROR($%02x): %s\n", code, ERROR_STRINGS[code]);
 }
 
+void prompt(char *cmd) {
+    printf("\r%s", cwd.drive);
+    if(cwd.truncated) printf("...");
+    printf("%s> ", cwd.folder);
+    if(cmd != NULL) {
+        printf("%s", cmd);
+    }
+    fflush_stdout();
+}
+
 void handle_error(zos_err_t err, char *msg, uint8_t fatal) {
   if(err != ERR_SUCCESS) {
-    printf("failed to %s, ", msg);
+    if(msg != NULL) printf("failed to %s, ", msg);
     print_error(err);
     if(fatal) __exit(err);
   }
@@ -124,7 +136,7 @@ void clear_command(void) {
 void use_history(HistoryNode *node) {
     if(!node) return;
     clear_command();
-    printf("\r> %s", node->str);
+    prompt(node->str);
     fflush_stdout();
     strncpy(buffer, node->str, COMMAND_MAX - 1);
     buffer[COMMAND_MAX - 1] = '\0';
@@ -163,13 +175,12 @@ zos_err_t run(unsigned char *b, uint8_t* s) {
     }
 
     if(strcmp(cmd, "cd") == 0) {
-        return chdir(args);
+        err = chdir(args);
+        handle_error(err, "change dir", 0);
+        return path_set_cwd(&cwd);
     }
     if(strcmp(cmd, "pwd") == 0) {
-        err = curdir(buffer);
-        handle_error(err, "Failed", 1);
-        printf("%s\n", buffer);
-        buffer[0] = '\0';
+        printf("%s\n", cwd.path);
         return ERR_SUCCESS;
     }
     if(strcmp(cmd, "exit") == 0) {
@@ -213,6 +224,8 @@ int main(int argc, char **argv) {
     (void*)argc;
     (void*)argv;
 
+    path_set_cwd(&cwd);
+
     history_init(&history);
     history_node = NULL;
 
@@ -220,7 +233,7 @@ int main(int argc, char **argv) {
     handle_error(err, "init keyboard", 1);
 
     for(;;) {
-        printf("> ");
+        prompt(NULL);
         fflush_stdout();
         for(;;) {
             kb_keys_t key = getkey();
@@ -253,7 +266,7 @@ int main(int argc, char **argv) {
                 case KB_ESC: {
                     history_node = NULL;
                     clear_command();
-                    printf("\r> ");
+                    prompt(NULL);
                     fflush_stdout();
                 } break;
 
@@ -279,7 +292,7 @@ int main(int argc, char **argv) {
                     zvb_peri_text_curs_x     = x;
                 } break;
                 default: {
-                    if(pos > COMMAND_MAX - 1) break;
+                    // if(pos > COMMAND_MAX - 1) break;
                     unsigned char c = getch(key);
                     if(c < 0x20 || c > 0x7D) break; // unprintable
                     buffer[pos++] = c;
