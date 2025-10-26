@@ -5,3 +5,6 @@ release/
 tmp/
 assets/*.zt[spm]
 *.tiled-session
+
+
+/autoexec.zs
