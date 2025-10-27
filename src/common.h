@@ -11,6 +11,7 @@
 extern dir_t cwd;
 extern History history;
 extern HistoryNode *history_node;
+extern char paths[MAX_PATHS][PATH_MAX];
 
 int fflush_stdout(void); // defined in ZOS
 

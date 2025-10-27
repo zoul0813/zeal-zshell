@@ -7,6 +7,7 @@
 dir_t cwd;
 History history;
 HistoryNode *history_node;
+char paths[MAX_PATHS][PATH_MAX];
 
 const char *ERROR_STRINGS[] = {
     "ERR_SUCCESS",

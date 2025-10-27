@@ -10,7 +10,7 @@
 #include "history.h"
 #include "process.h"
 
-char buffer[1024 * 4];
+char buffer[1024 * 2];
 char line[COMMAND_MAX];
 
 zos_err_t autoexec_process(void) {

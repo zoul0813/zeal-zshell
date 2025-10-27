@@ -57,6 +57,11 @@ int main(int argc, char **argv) {
     err = path_set_cwd(&cwd);
     handle_error(err, "path_set_cwd", 1);
 
+    for(uint8_t i = 0; i < MAX_PATHS; i++) {
+        paths[i][0] = '\0';
+    }
+    strcpy(paths[0], "A:/");
+
     autoexec_process();
 
     history_init(&history);
@@ -104,11 +109,12 @@ int main(int argc, char **argv) {
                 } break;
 
                 case KB_KEY_ENTER: {
+                    printf("\n");
+                    if(pos < 1) goto end_outer_loop;
                     buffer[pos] = '\0';
                     history_add(&history, buffer);
                     history_node = history.tail;
 
-                    printf("\n");
                     err = run(buffer);
                     if(err) print_error(err);
 
