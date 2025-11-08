@@ -7,14 +7,14 @@
 #include <zos_video.h>
 
 #include "common.h"
-#include "autoexec.h"
+#include "batch.h"
 #include "history.h"
 #include "process.h"
 
 
 static char line[COMMAND_MAX];
 
-zos_err_t autoexec_process(const char* path, autoexec_options_e options) {
+zos_err_t batch_process(const char* path, batch_options_e options) {
     (void*)path;
     (void*)options;
 
@@ -38,7 +38,7 @@ zos_err_t autoexec_process(const char* path, autoexec_options_e options) {
         return ERR_SUCCESS;
     }
 
-    // TODO: add option to "set quiet=1" for options |= AUTOEXEC_QUIET
+    // TODO: add option to "set quiet=1" for options |= BATCH_QUIET
 
     uint8_t *p = &buffer[0];
     uint16_t pos = 0;
@@ -76,7 +76,7 @@ zos_err_t autoexec_process(const char* path, autoexec_options_e options) {
                     }
                 }
 
-                if(!(options && AUTOEXEC_QUIET)) {
+                if(!(options && BATCH_QUIET)) {
                     setcolor(TEXT_COLOR_LIGHT_GRAY, TEXT_COLOR_BLACK);
                     printf("> %s\n", line);
                     setcolor(TEXT_COLOR_WHITE, TEXT_COLOR_BLACK);

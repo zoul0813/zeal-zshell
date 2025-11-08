@@ -24,7 +24,7 @@ add_executable(zshell
     "src/common.c"
     "src/history.c"
     "src/paths.c"
-    "src/autoexec.c"
+    "src/batch.c"
     "src/process.c"
 )
 

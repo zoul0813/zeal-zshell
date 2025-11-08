@@ -11,7 +11,7 @@
 #include "common.h"
 #include "history.h"
 #include "paths.h"
-#include "autoexec.h"
+#include "batch.h"
 #include "process.h"
 
 static unsigned char buffer[COMMAND_MAX];
@@ -65,12 +65,12 @@ int main(int argc, char **argv) {
 #if CONFIG_DEBUG_MODE
             printf(">> Batch Processor\n");
 #endif
-        err = autoexec_process(argv[0], AUTOEXEC_NONE);
+        err = batch_process(argv[0], BATCH_NONE);
         return err;
     }
 
 #if AUTOEXEC_ENABLED
-    autoexec_process(AUTOEXEC_FILENAME, AUTOEXEC_QUIET);
+    batch_process(AUTOEXEC_FILENAME, BATCH_QUIET);
 #endif
 
 #if HISTORY_ENABLED
