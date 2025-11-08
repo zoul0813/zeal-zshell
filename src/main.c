@@ -7,20 +7,20 @@
 #include <keyboard.h>
 #include <ansi.h>
 
+#include "config.h"
 #include "common.h"
 #include "history.h"
 #include "paths.h"
 #include "autoexec.h"
 #include "process.h"
 
-// PATH_MAX = 128
-// FILENAME_LEN_MAX = 16
 static unsigned char buffer[COMMAND_MAX];
 static uint8_t pos = 0;
 static uint16_t size;
-zos_err_t err;
+static zos_err_t err;
 
 void prompt(char *cmd) {
+    setcolor(TEXT_COLOR_LIGHT_GRAY, TEXT_COLOR_BLACK);
     printf("\r%s", cwd.drive);
     if(cwd.truncated) printf("...");
     printf("%s> ", cwd.folder);
@@ -28,6 +28,7 @@ void prompt(char *cmd) {
         printf("%s", cmd);
     }
     fflush_stdout();
+    setcolor(TEXT_COLOR_WHITE, TEXT_COLOR_BLACK);
 }
 
 void clear_command(void) {
@@ -51,9 +52,6 @@ void use_history(HistoryNode *node) {
 }
 
 int main(int argc, char **argv) {
-    (void*)argc;
-    (void*)argv;
-
     err = path_set_cwd(&cwd);
     handle_error(err, "path_set_cwd", 1);
 
@@ -62,10 +60,23 @@ int main(int argc, char **argv) {
     }
     strcpy(paths[0], "A:/");
 
-    autoexec_process();
+    if(argc == 1) {
+        // TODO: add flags for --quiet
+#if CONFIG_DEBUG_MODE
+            printf(">> Batch Processor\n");
+#endif
+        err = autoexec_process(argv[0], AUTOEXEC_NONE);
+        return err;
+    }
 
+#if AUTOEXEC_ENABLED
+    autoexec_process(AUTOEXEC_FILENAME, AUTOEXEC_QUIET);
+#endif
+
+#if HISTORY_ENABLED
     history_init(&history);
     history_node = NULL;
+#endif
 
     err = kb_mode_non_block_raw();
     handle_error(err, "init keyboard", 1);
@@ -81,6 +92,7 @@ int main(int argc, char **argv) {
                     goto quit;
                 }
 
+#if HISTORY_ENABLED
                 // History navigation
                 case KB_UP_ARROW: {
                     if(!history_node) {
@@ -107,13 +119,16 @@ int main(int argc, char **argv) {
                     prompt(NULL);
                     fflush_stdout();
                 } break;
+#endif
 
                 case KB_KEY_ENTER: {
                     printf("\n");
                     if(pos < 1) goto end_outer_loop;
                     buffer[pos] = '\0';
+#if HISTORY_ENABLED
                     history_add(&history, buffer);
                     history_node = history.tail;
+#endif
 
                     err = run(buffer);
                     if(err) print_error(err);

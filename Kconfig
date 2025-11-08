@@ -1,0 +1,91 @@
+mainmenu "ZShell Configuration"
+
+menu "Features"
+
+config AUTOEXEC_ENABLED
+    bool "Enable autoexec processing"
+    default y
+    help
+      Enable automatic execution of startup commands.
+
+config HISTORY_ENABLED
+    bool "Enable command history"
+    default y
+    help
+      Enable command history functionality.
+
+config COLOR_SUPPORT
+    bool "Enable color support"
+    default y
+    help
+      Enable ANSI color support in the shell.
+
+# config PROMPT_CUSTOMIZATION
+#     bool "Enable prompt customization"
+#     default y
+#     help
+#       Allow customization of the shell prompt.
+
+# config TAB_COMPLETION
+#     bool "Enable tab completion"
+#     default n
+#     help
+#       Enable tab completion for commands and filenames.
+
+# config BUILTIN_COMMANDS
+#     bool "Enable built-in commands"
+#     default y
+#     help
+#       Enable built-in shell commands like cd, ls, etc.
+
+endmenu
+
+menu "Buffer and Memory Settings"
+
+config COMMAND_MAX
+    int "Maximum command buffer size"
+    default 256
+    range 64 1024
+    help
+      Maximum size of the command input buffer in bytes.
+
+config MAX_PATHS
+    int "Maximum number of paths"
+    default 8
+    range 1 32
+    help
+      Maximum number of paths that can be stored in the shell.
+
+config HISTORY_MAX_ENTRIES
+    int "Maximum history entries"
+    depends on HISTORY_ENABLED
+    default 10
+    range 1 64
+    help
+      Maximum number of command history entries to keep.
+
+config AUTOEXEC_FILENAME
+    string "Autoexec filename"
+    depends on AUTOEXEC_ENABLED
+    default "B:/autoexec.zs"
+    help
+      Path and filename for the autoexec script that will be
+      automatically executed at shell startup.
+
+endmenu
+
+menu "Debug and Development"
+
+config DEBUG_MODE
+    bool "Enable debug mode"
+    default n
+    help
+      Enable debug output and additional error checking.
+
+config VERBOSE_ERRORS
+    bool "Enable verbose error messages"
+    default y
+    help
+      Show detailed error messages instead of just error codes.
+
+endmenu

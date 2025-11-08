@@ -3,9 +3,7 @@
 
 #include <stdio.h>
 #include <stdint.h>
-
-#define HISTORY_MAX 10
-#define COMMAND_MAX 256
+#include "config.h"
 
 typedef struct HistoryNode {
     char str[COMMAND_MAX];

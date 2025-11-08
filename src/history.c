@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
-
+#include "config.h"
 #include "history.h"
 
 HistoryNode* alloc_node(History *list) {

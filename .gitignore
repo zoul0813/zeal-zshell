@@ -7,4 +7,9 @@ assets/*.zt[spm]
 *.tiled-session
 
 
-/autoexec.zs
+/*.zs
+
+# Menuconfig generated files
+.config
+.config.old
+src/config.h

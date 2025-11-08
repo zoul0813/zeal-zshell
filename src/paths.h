@@ -6,8 +6,6 @@
 #include <zos_errors.h>
 #include <zos_vfs.h>
 
-#define MAX_PATHS 10
-
 typedef struct {
     char path[PATH_MAX];
     char drive[4];

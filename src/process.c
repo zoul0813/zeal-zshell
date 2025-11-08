@@ -6,11 +6,13 @@
 #include <zos_vfs.h>
 #include <zos_video.h>
 
+#include "config.h"
 #include "common.h"
 #include "process.h"
 #include "paths.h"
 #include "history.h"
 
+static zos_err_t retval;
 
 zos_err_t find_exec(unsigned char *name) {
     zos_stat_t zos_stat;
@@ -59,6 +61,20 @@ zos_err_t set(char* arg) {
     char name[FILENAME_LEN_MAX] = "";
     zos_err_t err = ERR_SUCCESS;
 
+    char *equals = strchr(arg, '=');
+    if(!equals) {
+        if(strcmp(arg, "PATH") == 0) {
+            for(uint8_t i = 0; i < MAX_PATHS; i++) {
+                if(paths[i][0] == '\0') break;
+                printf("%d: %s\n", i, paths[i]);
+            }
+            return ERR_SUCCESS;
+        } else {
+            printf("ERROR: Unknown variable: %s\n", arg);
+            return ERR_INVALID_PARAMETER;
+        }
+    }
+
     char *p = arg;
     char *s = arg;
     uint8_t i = 0;
@@ -81,6 +97,10 @@ zos_err_t set(char* arg) {
                 if(strncmp(name, "PATH", FILENAME_LEN_MAX) != 0) {
                     printf("ERROR: Invalid variable name: %s\n", name);
                     return ERR_INVALID_PARAMETER;
+                }
+
+                for(uint8_t j = 0; j < MAX_PATHS; j++) {
+                    paths[j][0] = '\0';
                 }
 
                 s = p + 1;
@@ -135,6 +155,10 @@ zos_err_t run(unsigned char *b) {
         }
     }
 
+    if(strcmp(cmd, "#") == 0) {
+        printf("%d\n", retval);
+        return ERR_SUCCESS;
+    }
     if(strcmp(cmd, "cd") == 0) {
         err = chdir(args);
         handle_error(err, "change dir", 0);
@@ -161,16 +185,9 @@ zos_err_t run(unsigned char *b) {
     if(strcmp(cmd, "set") == 0) {
         return set(args);
     }
-    if(strcmp(cmd, "paths") == 0) {
-        for(uint8_t i = 0; i < MAX_PATHS; i++) {
-            if(paths[i][0] == '\0') break;
-            printf("%d: %s\n", i, paths[i]);
-        }
-        return ERR_SUCCESS;
-    }
     if(strcmp(cmd, "which") == 0) {
         err = find_exec(args);
-        if(err) goto do_return;
+        if(err) return ERR_SUCCESS; // do nothing
         printf("%s\n", args);
         return ERR_SUCCESS;
     }
@@ -180,13 +197,14 @@ zos_err_t run(unsigned char *b) {
 
     unsigned char *argv = args;
 
-    uint8_t retval;
     err = exec(EXEC_PRESERVE_PROGRAM, cmd, &argv, &retval);
-    printf("\n");
-    if(!err && retval > 0) {
-        printf("Returned ");
-        print_error(retval);
-    }
+    if(retval) return retval;
+    // printf("\n");
+    // if(!err && retval > 0) {
+    //     err = retval;
+    //     printf("Returned ");
+    //     print_error(retval);
+    // }
 
 do_return:
     return err;
