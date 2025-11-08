@@ -40,7 +40,9 @@ zos_err_t autoexec_process(void) {
         if(c == '\n') {
             line[pos] = '\0';
             if(strlen(line) > 0) {
-                run(line);
+                if(line[0] != ';') {
+                    run(line);
+                }
             }
             pos = 0;
         } else {
