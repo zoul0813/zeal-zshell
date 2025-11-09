@@ -51,6 +51,47 @@ void use_history(HistoryNode *node) {
     pos = strlen(buffer);
 }
 
+void usage(void) {
+    printf("usage: zshell [-options] [path]\n");
+    printf("   q - quiet mode\n");
+}
+
+batch_options_e parse_args(char **argv, char *path) {
+    char* params = argv[0];
+    batch_options_e options = BATCH_NONE;
+
+    if(*params == '-') {
+        params++;
+        while(params) {
+            switch(*params) {
+                case 'q': {
+                    options |= BATCH_QUIET;
+                } break;
+                case 'h': {
+                    usage();
+                    exit(ERR_SUCCESS);
+                    return options;
+                } break;
+                case '\0':
+                case ' ':
+                    goto parsed;
+                default: {
+                    printf("Invalid option: %s\n", *params);
+                    usage();
+                    return ERR_INVALID_PARAMETER;
+                } break;
+            }
+            params++;
+        }
+    }
+parsed:
+    while(*params == ' ') params++;
+    if(*params != 0) {
+        strcpy(path, params);
+    }
+    return options;
+}
+
 int main(int argc, char **argv) {
     err = path_set_cwd(&cwd);
     handle_error(err, "path_set_cwd", 1);
@@ -61,11 +102,9 @@ int main(int argc, char **argv) {
     strcpy(paths[0], "A:/");
 
     if(argc == 1) {
-        // TODO: add flags for --quiet
-#if CONFIG_DEBUG_MODE
-            printf(">> Batch Processor\n");
-#endif
-        err = batch_process(argv[0], BATCH_NONE);
+        char path[PATH_MAX];
+        batch_options_e options = parse_args(argv, path);
+        err = batch_process(path, options);
         return err;
     }
 
