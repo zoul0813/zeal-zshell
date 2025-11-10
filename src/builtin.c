@@ -184,7 +184,7 @@ static uint8_t cmd_false(char* args)
 static uint8_t cmd_ver(char* args)
 {
     (void*) args;
-    printf("%s v%s-%d\n", ZSHELL_APP_NAME, ZSHELL_VERSION_STRING, ZSHELL_VERSION_BUILD);
+    printf("%s v%s-%d\n", APP_NAME, APP_VERSION_STRING, APP_VERSION_BUILD);
     return ERR_SUCCESS;
 }
 

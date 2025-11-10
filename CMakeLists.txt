@@ -1,9 +1,10 @@
 cmake_minimum_required(VERSION 3.16)
 
-# ZShell Version
-set(ZSHELL_VERSION_MAJOR 0)
-set(ZSHELL_VERSION_MINOR 1)
-set(ZSHELL_VERSION_PATCH 0)
+# Application Version
+set(APP_VERSION_MAJOR 0)
+set(APP_VERSION_MINOR 1)
+set(APP_VERSION_PATCH 0)
+set(APP_NAME "ZShell")
 
 set(CMAKE_VERBOSE_MAKEFILE ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -69,9 +70,10 @@ add_custom_target(increment_build_number
         -DBUILD_NUMBER_FILE=${CMAKE_CURRENT_LIST_DIR}/build_number.txt
         -DVERSION_TEMPLATE=${CMAKE_CURRENT_LIST_DIR}/src/version.h.in
         -DVERSION_OUTPUT=${CMAKE_CURRENT_LIST_DIR}/src/version.h
-        -DZSHELL_VERSION_MAJOR=${ZSHELL_VERSION_MAJOR}
-        -DZSHELL_VERSION_MINOR=${ZSHELL_VERSION_MINOR}
-        -DZSHELL_VERSION_PATCH=${ZSHELL_VERSION_PATCH}
+        -DAPP_VERSION_MAJOR=${APP_VERSION_MAJOR}
+        -DAPP_VERSION_MINOR=${APP_VERSION_MINOR}
+        -DAPP_VERSION_PATCH=${APP_VERSION_PATCH}
+        -DAPP_NAME=${APP_NAME}
         -P ${CMAKE_CURRENT_LIST_DIR}/increment_version.cmake
     BYPRODUCTS ${CMAKE_CURRENT_LIST_DIR}/src/version.h
     COMMENT "Incrementing build number and generating version.h"

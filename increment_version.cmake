@@ -1,20 +1,18 @@
-# Read or create build number file
+# Read current build number
 if(EXISTS ${BUILD_NUMBER_FILE})
-    file(READ ${BUILD_NUMBER_FILE} ZSHELL_VERSION_BUILD)
-    string(STRIP "${ZSHELL_VERSION_BUILD}" ZSHELL_VERSION_BUILD)
-    math(EXPR ZSHELL_VERSION_BUILD "${ZSHELL_VERSION_BUILD} + 1")
+    file(READ ${BUILD_NUMBER_FILE} BUILD_NUMBER)
+    string(STRIP ${BUILD_NUMBER} BUILD_NUMBER)
 else()
-    set(ZSHELL_VERSION_BUILD 1)
+    set(BUILD_NUMBER 0)
 endif()
 
-# Write updated build number
-file(WRITE ${BUILD_NUMBER_FILE} ${ZSHELL_VERSION_BUILD})
+# Increment build number
+math(EXPR BUILD_NUMBER "${BUILD_NUMBER} + 1")
 
-# Generate version.h from template
-configure_file(
-    ${VERSION_TEMPLATE}
-    ${VERSION_OUTPUT}
-    @ONLY
-)
+# Write new build number back to file
+file(WRITE ${BUILD_NUMBER_FILE} ${BUILD_NUMBER})
 
-message(STATUS "Build number incremented to: ${ZSHELL_VERSION_BUILD}")
+# Configure the version template
+configure_file(${VERSION_TEMPLATE} ${VERSION_OUTPUT} @ONLY)
+
+message(STATUS "Build number incremented to: ${BUILD_NUMBER}")
