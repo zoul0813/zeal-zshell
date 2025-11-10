@@ -1,5 +1,10 @@
 cmake_minimum_required(VERSION 3.16)
 
+# ZShell Version
+set(ZSHELL_VERSION_MAJOR 0)
+set(ZSHELL_VERSION_MINOR 1)
+set(ZSHELL_VERSION_PATCH 0)
+
 set(CMAKE_VERBOSE_MAKEFILE ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
@@ -36,7 +41,7 @@ target_include_directories(zshell PRIVATE ${CMAKE_CURRENT_LIST_DIR}/include)
 target_link_directories(zshell PRIVATE ${CMAKE_CURRENT_LIST_DIR}/lib)
 
 # Link with .lib extension for SDCC
-target_link_libraries(zshell zvb keyboard.lib ansi.lib)
+target_link_libraries(zshell zvb_gfx keyboard.lib ansi.lib)
 
 # Add menuconfig support to the zshell target (if available)
 if(COMMAND add_menuconfig_support)
@@ -57,3 +62,20 @@ add_custom_command(TARGET zshell_bin POST_BUILD
         ${CMAKE_CURRENT_LIST_DIR}/test.zs
         ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test.zs
 )
+
+# Create a custom target that increments build number on every build
+add_custom_target(increment_build_number
+    COMMAND ${CMAKE_COMMAND}
+        -DBUILD_NUMBER_FILE=${CMAKE_CURRENT_LIST_DIR}/build_number.txt
+        -DVERSION_TEMPLATE=${CMAKE_CURRENT_LIST_DIR}/src/version.h.in
+        -DVERSION_OUTPUT=${CMAKE_CURRENT_LIST_DIR}/src/version.h
+        -DZSHELL_VERSION_MAJOR=${ZSHELL_VERSION_MAJOR}
+        -DZSHELL_VERSION_MINOR=${ZSHELL_VERSION_MINOR}
+        -DZSHELL_VERSION_PATCH=${ZSHELL_VERSION_PATCH}
+        -P ${CMAKE_CURRENT_LIST_DIR}/increment_version.cmake
+    BYPRODUCTS ${CMAKE_CURRENT_LIST_DIR}/src/version.h
+    COMMENT "Incrementing build number and generating version.h"
+)
+
+# Make zshell depend on the version increment
+add_dependencies(zshell increment_build_number)

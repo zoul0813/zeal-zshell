@@ -108,6 +108,8 @@ int main(int argc, char **argv) {
         return err;
     }
 
+    run("ver"); printf("\n");
+
 #if AUTOEXEC_ENABLED
     batch_process(AUTOEXEC_FILENAME, BATCH_QUIET);
 #endif

@@ -13,3 +13,5 @@ assets/*.zt[spm]
 .config
 .config.old
 src/config.h
+build_number.txt
+src/version.h

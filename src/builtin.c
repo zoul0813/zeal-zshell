@@ -11,6 +11,7 @@
 #include "history.h"
 #include "process.h"
 #include "builtin.h"
+#include "version.h"
 
 static zos_err_t retval;
 
@@ -180,6 +181,13 @@ static uint8_t cmd_false(char* args)
     return ERR_FAILURE;
 }
 
+static uint8_t cmd_ver(char* args)
+{
+    (void*) args;
+    printf("%s %s-%d\n", ZSHELL_APP_NAME, ZSHELL_VERSION_STRING, ZSHELL_VERSION_BUILD);
+    return ERR_SUCCESS;
+}
+
 // Lookup table
 const builtin_t builtins[] = {
     {      "#",    cmd_hash},
@@ -192,6 +200,7 @@ const builtin_t builtins[] = {
     {  "which",   cmd_which},
     {   "true",    cmd_true},
     {  "false",   cmd_false},
+    {    "ver",     cmd_ver},
     {       "",        NULL}  // sentinel
 };
 
