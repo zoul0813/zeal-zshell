@@ -46,24 +46,24 @@ zos_err_t batch_process(const char* path, batch_options_e options) {
 
     while(size > 0) {
         char c = *p;
-        if(c != '\n') {
+        if(c != CH_NEWLINE) {
             line[pos] = c;
             pos++;
         }
 
-        if(c == '\n' || size == 1) {
-            line[pos] = '\0';
+        if(c == CH_NEWLINE || size == 1) {
+            line[pos] = CH_NULL;
             if(strlen(line) > 0) {
-                if(line[0] == ';') goto next_line;
+                if(line[0] == BATCH_COMMENT) goto next_line;
 
                 char *cmd = line;
                 uint8_t do_run = 1;
 
-                if(cmd[0] == '?' || cmd[0] == ':') {
-                    if(cmd[0] == '?' && err) do_run = 0;
-                    if(cmd[0] == ':' && !err) do_run = 0;
+                if(cmd[0] == TERNARY_TRUE || cmd[0] == TERNARY_FALSE) {
+                    if(cmd[0] == TERNARY_TRUE && err) do_run = 0;
+                    if(cmd[0] == TERNARY_FALSE && !err) do_run = 0;
                     cmd++;
-                    while(*cmd == ' ') cmd++; // skip spaces
+                    while(*cmd == CH_SPACE) cmd++; // skip spaces
                     cond_block = 1;
                 } else {
                     // Not a conditional - reset error if we were in a conditional block

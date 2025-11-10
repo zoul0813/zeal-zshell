@@ -26,9 +26,9 @@ static uint8_t cmd_hash(char* args)
 static uint8_t cmd_cd(char* args)
 {
     uint8_t l = strlen(args);
-    if (args[l - 1] != '/') {
-        args[l]     = '/';
-        args[l + 1] = '\0';
+    if (args[l - 1] != PATH_SEP) {
+        args[l]     = PATH_SEP;
+        args[l + 1] = CH_NULL;
     }
 
     zos_err_t err = chdir(args);
@@ -73,11 +73,11 @@ zos_err_t set_path(char *path, char* str, size_t len) {
         return ERR_INVALID_PATH;
     }
     strncpy(value, str, len);
-    if(value[len-1] != '/') {
-        value[len] = '/';
+    if(value[len-1] != PATH_SEP) {
+        value[len] = PATH_SEP;
         len++;
     }
-    value[len] = '\0';
+    value[len] = CH_NULL;
     strncpy(path, value, PATH_MAX);
     return ERR_SUCCESS;
 }
@@ -91,7 +91,7 @@ static uint8_t cmd_set(char* args)
     if(!equals) {
         if(strcmp(args, "PATH") == 0) {
             for(uint8_t i = 0; i < MAX_PATHS; i++) {
-                if(paths[i][0] == '\0') break;
+                if(paths[i][0] == CH_NULL) break;
                 printf("%d: %s\n", i, paths[i]);
             }
             return ERR_SUCCESS;
@@ -104,11 +104,11 @@ static uint8_t cmd_set(char* args)
     char *p = args;
     char *s = args;
     uint8_t i = 0;
-    while(*p != '\0') {
+    while(*p != CH_NULL) {
         switch(*p) {
             case '=': {
                 // will hit this condition if we encounter a second "="
-                if(name[0] != '\0') {
+                if(name[0] != CH_NULL) {
                     printf("ERROR: Invalid set: %s\n", args);
                     return ERR_INVALID_PARAMETER;
                 }
@@ -118,7 +118,7 @@ static uint8_t cmd_set(char* args)
                     return ERR_INVALID_PARAMETER;
                 }
                 strncpy(name, s, l);
-                name[l] = '\0';
+                name[l] = CH_NULL;
 
                 if(strncmp(name, "PATH", FILENAME_LEN_MAX) != 0) {
                     printf("ERROR: Invalid variable name: %s\n", name);
@@ -126,14 +126,14 @@ static uint8_t cmd_set(char* args)
                 }
 
                 for(uint8_t j = 0; j < MAX_PATHS; j++) {
-                    paths[j][0] = '\0';
+                    paths[j][0] = CH_NULL;
                 }
 
                 s = p + 1;
             } break;
             case ',': {
                 // encountered the comma before setting the var name
-                if(name[0] == '\0') {
+                if(name[0] == CH_NULL) {
                     printf("ERROR: Invalid set: %s\n", args);
                     return ERR_INVALID_PARAMETER;
                 }
@@ -184,7 +184,7 @@ static uint8_t cmd_false(char* args)
 static uint8_t cmd_ver(char* args)
 {
     (void*) args;
-    printf("%s %s-%d\n", ZSHELL_APP_NAME, ZSHELL_VERSION_STRING, ZSHELL_VERSION_BUILD);
+    printf("%s v%s-%d\n", ZSHELL_APP_NAME, ZSHELL_VERSION_STRING, ZSHELL_VERSION_BUILD);
     return ERR_SUCCESS;
 }
 

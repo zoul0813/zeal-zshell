@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <string.h>
 #include "config.h"
+#include "common.h"
 #include "history.h"
 
 HistoryNode* alloc_node(History *list) {
@@ -9,7 +10,7 @@ HistoryNode* alloc_node(History *list) {
         if(!list->used[i]) {
             list->used[i] = 1;
             HistoryNode *n = &list->nodes[i];
-            n->str[0] = '\0';
+            n->str[0] = CH_NULL;
             n->next = NULL;
             n->prev = NULL;
             return n;
@@ -73,7 +74,7 @@ HistoryNode* history_find(History *list, char* str) {
 }
 
 int8_t history_add(History *list, char* str) {
-    if(!str || str[0] == '\0') {
+    if(!str || str[0] == CH_NULL) {
         return 0; /// no command
     }
 
@@ -89,7 +90,7 @@ int8_t history_add(History *list, char* str) {
         if(list->head) {
             node = list->head;
             history_remove(list, node);
-            node->str[0] = '\0';
+            node->str[0] = CH_NULL;
         }
         // else {
         //     return -1; // no nodes available, list is empty ... how'd we get here?
@@ -97,7 +98,7 @@ int8_t history_add(History *list, char* str) {
     }
 
     strncpy(node->str, str, COMMAND_MAX - 1);
-    node->str[COMMAND_MAX-1] = '\0';
+    node->str[COMMAND_MAX-1] = CH_NULL;
     history_push(list, node);
     return 0;
 }

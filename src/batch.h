@@ -1,6 +1,10 @@
 #ifndef BATCH_H
 #define BATCH_H
 
+#define TERNARY_TRUE    '?'
+#define TERNARY_FALSE   ':'
+#define BATCH_COMMENT   ';'
+
 typedef enum {
     BATCH_NONE = 0,
     BATCH_QUIET = 1,

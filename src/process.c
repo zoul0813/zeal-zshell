@@ -35,7 +35,7 @@ static zos_err_t find_with_extension(unsigned char* name, const char* extension,
 
     // Try in all paths
     for (uint8_t i = 0; i < MAX_PATHS; i++) {
-        if (paths[i][0] == '\0')
+        if (paths[i][0] == CH_NULL)
             break;
 
         strncpy(path, paths[i], PATH_MAX);
@@ -61,7 +61,7 @@ zos_err_t find_exec(unsigned char* name)
 
     // Check if the name already has an extension
     unsigned char* dot   = strrchr(name, '.');
-    unsigned char* slash = strrchr(name, '/');
+    unsigned char* slash = strrchr(name, PATH_SEP);
 
     // If there's a dot after the last slash (or no slash), it has an extension
     int has_extension = (dot != NULL && (slash == NULL || dot > slash));
@@ -102,19 +102,19 @@ zos_err_t run(const char* arg)
     unsigned char cmd[PATH_MAX];
     strncpy(cmd, arg, PATH_MAX);
     unsigned char args[PATH_MAX];
-    args[0] = '\0'; // init to empty string
+    args[0] = CH_NULL; // init to empty string
 
-    if (l > 2 && cmd[0] == '.' && cmd[1] == '/') {
+    if (l > 2 && cmd[0] == '.' && cmd[1] == PATH_SEP) {
         strncpy(cmd, &arg[2], PATH_MAX);
     } else {
         strncpy(cmd, arg, PATH_MAX);
     }
 
     unsigned char* p = cmd;
-    while (*p++ != '\0') {
-        if (*p == ' ') {
-            *p++ = '\0';
-            if (*p != '\0') {
+    while (*p++ != CH_NULL) {
+        if (*p == CH_SPACE) {
+            *p++ = CH_NULL;
+            if (*p != CH_NULL) {
                 strncpy(args, p, PATH_MAX);
             }
             break;

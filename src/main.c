@@ -22,7 +22,7 @@ static zos_err_t err;
 void prompt(char *cmd) {
     setcolor(TEXT_COLOR_LIGHT_GRAY, TEXT_COLOR_BLACK);
     printf("\r%s", cwd.drive);
-    if(cwd.truncated) printf("...");
+    if(cwd.truncated) printf("/...");
     printf("%s> ", cwd.folder);
     if(cmd != NULL) {
         printf("%s", cmd);
@@ -36,7 +36,7 @@ void clear_command(void) {
     for(uint8_t i = 0; i < pos+4; i++) {
         printf(" ");
     }
-    buffer[0] = '\0';
+    buffer[0] = CH_NULL;
     pos = 0;
     fflush_stdout();
 }
@@ -47,7 +47,7 @@ void use_history(HistoryNode *node) {
     prompt(node->str);
     fflush_stdout();
     strncpy(buffer, node->str, COMMAND_MAX - 1);
-    buffer[COMMAND_MAX - 1] = '\0';
+    buffer[COMMAND_MAX - 1] = CH_NULL;
     pos = strlen(buffer);
 }
 
@@ -72,8 +72,8 @@ batch_options_e parse_args(char **argv, char *path) {
                     exit(ERR_SUCCESS);
                     return options;
                 } break;
-                case '\0':
-                case ' ':
+                case CH_NULL:
+                case CH_SPACE:
                     goto parsed;
                 default: {
                     printf("Invalid option: %s\n", *params);
@@ -85,7 +85,7 @@ batch_options_e parse_args(char **argv, char *path) {
         }
     }
 parsed:
-    while(*params == ' ') params++;
+    while(*params == CH_SPACE) params++;
     if(*params != 0) {
         strcpy(path, params);
     }
@@ -97,7 +97,7 @@ int main(int argc, char **argv) {
     handle_error(err, "path_set_cwd", 1);
 
     for(uint8_t i = 0; i < MAX_PATHS; i++) {
-        paths[i][0] = '\0';
+        paths[i][0] = CH_NULL;
     }
     strcpy(paths[0], "A:/");
 
@@ -165,7 +165,7 @@ int main(int argc, char **argv) {
                 case KB_KEY_ENTER: {
                     printf("\n");
                     if(pos < 1) goto end_outer_loop;
-                    buffer[pos] = '\0';
+                    buffer[pos] = CH_NULL;
 #if HISTORY_ENABLED
                     history_add(&history, buffer);
                     history_node = history.tail;
@@ -174,16 +174,16 @@ int main(int argc, char **argv) {
                     err = run(buffer);
                     if(err) print_error(err);
 
-                    buffer[0] = '\0';
+                    buffer[0] = CH_NULL;
                     pos = 0;
                 } goto end_outer_loop;
                 case KB_KEY_BACKSPACE: {
                     if(pos == 0) break;
                     pos--;
-                    buffer[pos] = '\0';
+                    buffer[pos] = CH_NULL;
                     uint8_t x                = zvb_peri_text_curs_x - 1;
                     zvb_peri_text_curs_x     = x;
-                    zvb_peri_text_print_char = '\0';
+                    zvb_peri_text_print_char = CH_NULL;
                     zvb_peri_text_curs_x     = x;
                 } break;
                 default: {
