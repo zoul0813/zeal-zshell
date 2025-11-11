@@ -16,7 +16,7 @@
 
 static zos_err_t retval;
 
-static zos_err_t find_with_extension(unsigned char* name, const char* extension, unsigned char* result_path)
+static zos_err_t find_with_extension(unsigned char* name, const char* extension, uint8_t shallow, unsigned char* result_path)
 {
     zos_stat_t zos_stat;
     unsigned char path[PATH_MAX];
@@ -32,6 +32,8 @@ static zos_err_t find_with_extension(unsigned char* name, const char* extension,
         strncpy(result_path, path, PATH_MAX);
         return ERR_SUCCESS;
     }
+
+    if(shallow) return ERR_NO_SUCH_ENTRY;
 
     // Try in all paths
     for (uint8_t i = 0; i < MAX_PATHS; i++) {
@@ -54,7 +56,7 @@ static zos_err_t find_with_extension(unsigned char* name, const char* extension,
     return ERR_NO_SUCH_ENTRY;
 }
 
-zos_err_t find_exec(unsigned char* name)
+zos_err_t find_exec(unsigned char* name, uint8_t shallow)
 {
     unsigned char path[PATH_MAX];
     zos_err_t err;
@@ -66,24 +68,24 @@ zos_err_t find_exec(unsigned char* name)
     // If there's a dot after the last slash (or no slash), it has an extension
     int has_extension = (dot != NULL && (slash == NULL || dot > slash));
 
-    // Try without extension (including current directory and all paths)
-    err = find_with_extension(name, "", path);
+    // Try without extension
+    err = find_with_extension(name, "", shallow, path);
     if (!err) {
         strncpy(name, path, PATH_MAX);
         return ERR_SUCCESS;
     }
 
-    // Only try with extensions if the original name doesn't have one
-    if (!has_extension) {
+    // Only try with extensions if not shallow and the original name doesn't have one
+    if (!shallow && !has_extension) {
         // Try with .bin extension
-        err = find_with_extension(name, ".bin", path);
+        err = find_with_extension(name, ".bin", shallow, path);
         if (!err) {
             strncpy(name, path, PATH_MAX);
             return ERR_SUCCESS;
         }
 
         // Try with .zs extension
-        err = find_with_extension(name, ".zs", path);
+        err = find_with_extension(name, ".zs", shallow, path);
         if (!err) {
             strncpy(name, path, PATH_MAX);
             return ERR_SUCCESS;
@@ -100,11 +102,14 @@ zos_err_t run(const char* arg)
     uint16_t l = strlen(arg);
 
     unsigned char cmd[PATH_MAX];
-    strncpy(cmd, arg, PATH_MAX);
+    // strncpy(cmd, arg, PATH_MAX);
     unsigned char args[PATH_MAX];
     args[0] = CH_NULL; // init to empty string
 
-    if (l > 2 && cmd[0] == '.' && cmd[1] == PATH_SEP) {
+    uint8_t shallow = 0;
+
+    if (l > 2 && arg[0] == '.' && arg[1] == PATH_SEP) {
+        shallow = 1;
         strncpy(cmd, &arg[2], PATH_MAX);
     } else {
         strncpy(cmd, arg, PATH_MAX);
@@ -121,11 +126,12 @@ zos_err_t run(const char* arg)
         }
     }
 
-    err = builtin(cmd, args);
-    if (err != 0xFF)
-        return err;
+    if(!shallow) {
+        err = builtin(cmd, args);
+        if (err != 0xFF) return err;
+    }
 
-    err = find_exec(cmd);
+    err = find_exec(cmd, shallow);
     if (err)
         goto do_return;
 

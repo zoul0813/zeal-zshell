@@ -163,7 +163,7 @@ static uint8_t cmd_which(char* args)
         }
     }
 
-    zos_err_t err = find_exec(args);
+    zos_err_t err = find_exec(args, 0);
     if (err) return ERR_NO_SUCH_ENTRY;
     printf("%s\n", args);
     return ERR_SUCCESS;
