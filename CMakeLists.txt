@@ -5,6 +5,7 @@ set(APP_VERSION_MAJOR 0)
 set(APP_VERSION_MINOR 1)
 set(APP_VERSION_PATCH 0)
 set(APP_NAME "ZShell")
+set(target_name "zshell")
 
 set(CMAKE_VERBOSE_MAKEFILE ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -51,17 +52,33 @@ endif()
 
 zos_add_outputs(zshell)
 
-add_custom_command(TARGET zshell_bin POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E rename
-        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/zshell.bin
-        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/zshell
-
+# Copy the .zs scripts over
+add_custom_command(TARGET ${target_name}_bin POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
         ${CMAKE_CURRENT_LIST_DIR}/autoexec.zs
         ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/autoexec.zs
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
         ${CMAKE_CURRENT_LIST_DIR}/test.zs
         ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test.zs
+)
+
+# Rename target, and move debug files
+add_custom_command(TARGET ${target_name}_bin POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_SOURCE_DIR}/debug
+    COMMAND ${CMAKE_COMMAND} -E rename
+        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${target_name}.cdb
+        ${CMAKE_SOURCE_DIR}/debug/${target_name}.cdb
+    COMMAND ${CMAKE_COMMAND} -E rename
+        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${target_name}.map
+        ${CMAKE_SOURCE_DIR}/debug/${target_name}.map
+    COMMAND ${CMAKE_COMMAND} -E rename
+        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${target_name}.ihx
+        ${CMAKE_SOURCE_DIR}/debug/${target_name}.ihx
+    COMMAND ${CMAKE_COMMAND} -E rename
+        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${target_name}.bin
+        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${target_name}
+    COMMENT "Moving debug files to debug directory"
+    VERBATIM
 )
 
 # Create a custom target that increments build number on every build
