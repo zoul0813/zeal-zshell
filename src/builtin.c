@@ -156,16 +156,32 @@ static uint8_t cmd_set(char* args)
 
 static uint8_t cmd_which(char* args)
 {
-    for (int i = 0; builtins[i].handler != NULL; i++) {
-        if (strcmp(args, builtins[i].name) == 0) {
-            printf("built-in: %s\n", args);
-            return ERR_SUCCESS;
+    uint8_t shallow = 0;
+    char* search_name = args;
+
+    // Check if it starts with ./
+    if (strlen(args) > 2 && args[0] == '.' && args[1] == PATH_SEP) {
+        shallow = 1;
+        search_name = &args[2];  // Strip the ./ prefix
+    }
+
+    // Only check builtins if not using ./
+    if (!shallow) {
+        for (int i = 0; builtins[i].handler != NULL; i++) {
+            if (strcmp(search_name, builtins[i].name) == 0) {
+                printf("built-in: %s\n", search_name);
+                return ERR_SUCCESS;
+            }
         }
     }
 
-    zos_err_t err = find_exec(args, 0);
+    // Need to copy to a mutable buffer since find_exec modifies it
+    char cmd[PATH_MAX];
+    strncpy(cmd, search_name, PATH_MAX);
+
+    zos_err_t err = find_exec(cmd, shallow);
     if (err) return ERR_NO_SUCH_ENTRY;
-    printf("%s\n", args);
+    printf("%s\n", cmd);
     return ERR_SUCCESS;
 }
 

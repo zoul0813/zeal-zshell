@@ -23,17 +23,18 @@ static zos_err_t find_with_extension(unsigned char* name, const char* extension,
     zos_err_t err;
 
     // Try in current location first
-    strncpy(path, name, PATH_MAX);
-    if (extension && strlen(extension) > 0) {
-        strncat(path, extension, PATH_MAX - strlen(path) - 1);
+    if(shallow) {
+        strncpy(path, name, PATH_MAX);
+        if (extension && strlen(extension) > 0) {
+            strncat(path, extension, PATH_MAX - strlen(path) - 1);
+        }
+        err = stat(path, &zos_stat);
+        if (!err && D_ISFILE(zos_stat.s_flags)) {
+            strncpy(result_path, path, PATH_MAX);
+            return ERR_SUCCESS;
+        }
+        return ERR_NO_SUCH_ENTRY;
     }
-    err = stat(path, &zos_stat);
-    if (!err && D_ISFILE(zos_stat.s_flags)) {
-        strncpy(result_path, path, PATH_MAX);
-        return ERR_SUCCESS;
-    }
-
-    if(shallow) return ERR_NO_SUCH_ENTRY;
 
     // Try in all paths
     for (uint8_t i = 0; i < MAX_PATHS; i++) {
