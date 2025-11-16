@@ -18,6 +18,7 @@ static unsigned char buffer[COMMAND_MAX];
 static uint8_t pos = 0;
 static uint16_t size;
 static zos_err_t err;
+static zos_stat_t zos_stat;
 
 void prompt(char *cmd) {
     setcolor(TEXT_COLOR_LIGHT_GRAY, TEXT_COLOR_BLACK);
@@ -111,7 +112,12 @@ int main(int argc, char **argv) {
     run("ver"); printf("\n");
 
 #if AUTOEXEC_ENABLED
-    batch_process(AUTOEXEC_FILENAME, BATCH_QUIET);
+    err = stat(AUTOEXEC_FILENAME, &zos_stat);
+    if(!err) {
+        batch_process(AUTOEXEC_FILENAME, BATCH_QUIET);
+    } else {
+        printf("Could not load %s\n", AUTOEXEC_FILENAME);
+    }
 #endif
 
 #if HISTORY_ENABLED

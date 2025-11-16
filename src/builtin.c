@@ -188,6 +188,12 @@ static uint8_t cmd_ver(char* args)
     return ERR_SUCCESS;
 }
 
+static uint8_t cmd_reset(char * args) {
+    __asm__(
+        "rst 0\n"
+    );
+}
+
 // Lookup table
 const builtin_t builtins[] = {
     {      "#",    cmd_hash},
@@ -201,6 +207,7 @@ const builtin_t builtins[] = {
     {   "true",    cmd_true},
     {  "false",   cmd_false},
     {    "ver",     cmd_ver},
+    {  "reset",   cmd_reset},
     {       "",        NULL}  // sentinel
 };
 

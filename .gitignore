@@ -9,6 +9,7 @@ assets/*.zt[spm]
 
 
 /*.zs
+/*.img
 
 # Menuconfig generated files
 .config
