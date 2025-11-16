@@ -12,6 +12,9 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/bin)
 
+# Ensure the bin directory exists
+file(MAKE_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+
 set(ZOS_TOOLCHAIN sdcc)
 include($ENV{ZOS_PATH}/cmake/zos_init.cmake)
 
@@ -52,14 +55,13 @@ endif()
 
 zos_add_outputs(zshell)
 
-# Copy the .zs scripts over
+# Copy the .zs scripts over (only if they exist at build time)
 add_custom_command(TARGET ${target_name}_bin POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        ${CMAKE_CURRENT_LIST_DIR}/autoexec.zs
-        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/autoexec.zs
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        ${CMAKE_CURRENT_LIST_DIR}/test.zs
-        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test.zs
+    COMMAND ${CMAKE_COMMAND} -E echo "Checking for .zs scripts to copy..."
+    COMMAND test -f ${CMAKE_CURRENT_LIST_DIR}/autoexec.zs && ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_LIST_DIR}/autoexec.zs ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/autoexec.zs || echo "autoexec.zs not found, skipping"
+    COMMAND test -f ${CMAKE_CURRENT_LIST_DIR}/test.zs && ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_LIST_DIR}/test.zs ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test.zs || echo "test.zs not found, skipping"
+    COMMENT "Copying .zs scripts if they exist"
+    VERBATIM
 )
 
 # Rename target, and move debug files

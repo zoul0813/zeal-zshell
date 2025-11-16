@@ -208,6 +208,7 @@ static uint8_t cmd_reset(char * args) {
     __asm__(
         "rst 0\n"
     );
+    return 0;
 }
 
 // Lookup table
