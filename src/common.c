@@ -49,8 +49,9 @@ int __exit(zos_err_t err) {
 }
 
 void print_error(uint8_t code) {
-    if(code >= ERROR_STRINGS_LEN) code = ERROR_STRINGS_LEN-1;
-    printf("ERROR($%02x): %s\n", code, ERROR_STRINGS[code]);
+    uint8_t c = code;
+    if(c >= ERROR_STRINGS_LEN) c = ERROR_STRINGS_LEN-1;
+    printf("ERROR($%02X): %s\n", code, ERROR_STRINGS[c]);
 }
 
 void handle_error(zos_err_t err, char *msg, uint8_t fatal) {
