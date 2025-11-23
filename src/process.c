@@ -8,6 +8,7 @@
 
 #include "config.h"
 #include "common.h"
+#include "keyboard.h"
 #include "builtin.h"
 #include "process.h"
 #include "paths.h"
@@ -146,6 +147,7 @@ zos_err_t run(const char* arg)
     unsigned char* argv = args;
 
     err = exec(EXEC_PRESERVE_PROGRAM, cmd, &argv, &retval);
+    err = kb_mode_non_block_raw();
     if (retval)
         return retval;
 
