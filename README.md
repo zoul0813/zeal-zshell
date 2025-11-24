@@ -2,6 +2,14 @@
 
 A new shell for Zeal 8-bit OS, with history, batch processing, and a few other extras.
 
+## Try it out
+
+> [!NOTE]
+> You can check out a live demo of ZShell + [coreutils](https://github.com/zoul0813/zeal-coreutils)
+>
+> [<kbd> <br> <br> &nbsp;&nbsp; Try it now! &nbsp;&nbsp; <br> <br> </kbd>](https://zoul0813.github.io/zeal-zshell/)
+
+
 ## Installation
 
 You can either [build ZShell from source](#building-from-source), or use one of the [pre-built binaries](https://github.com/zoul0813/zeal-zshell/releases).
