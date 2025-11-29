@@ -1,0 +1,44 @@
+name: build
+on:
+  push:
+    branches:
+      - main
+      - build-workflow
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup ZDE
+        uses: actions/checkout@v3
+        with:
+          repository: zoul0813/zeal-dev-environment
+          path: zeal-dev-environment
+          submodules: true
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Setup Docker Compose
+        run: sudo apt-get update && sudo apt-get install -y docker-compose
+
+      - name: Pull ZDE image
+        run: docker pull zoul0813/zeal-dev-environment:latest
+
+      - name: Build with ZDE
+        env:
+          ZDE_QUIET_PULL: "1"
+        run: |
+          ./zeal-dev-environment/zde cmake
+
+      - name: Upload binaries
+        uses: actions/upload-artifact@v4
+        with:
+          name: zshell-binaries
+          path: |
+            bin/zshell
