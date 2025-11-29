@@ -1,6 +1,9 @@
-#include <stdio.h>
+// #include <stdio.h>
+// #include <string.h>
+#include <stddef.h>
 #include <stdint.h>
-#include <string.h>
+#include <core.h>
+
 #include "config.h"
 #include "common.h"
 #include "history.h"
@@ -65,7 +68,7 @@ void history_push(History *list, HistoryNode *node) {
 HistoryNode* history_find(History *list, char* str) {
     HistoryNode *node = list->head;
     while(node) {
-        if(strcmp(node->str, str) == 0) {
+        if(str_cmp(node->str, str) == 0) {
             return node;
         }
         node = node->next;
@@ -97,7 +100,7 @@ int8_t history_add(History *list, char* str) {
         // }
     }
 
-    strncpy(node->str, str, COMMAND_MAX - 1);
+    str_cpyn(node->str, str, COMMAND_MAX - 1);
     node->str[COMMAND_MAX-1] = CH_NULL;
     history_push(list, node);
     return 0;

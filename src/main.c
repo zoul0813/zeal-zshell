@@ -1,11 +1,13 @@
-#include <stdio.h>
-#include <string.h>
+// #include <stdio.h>
+// #include <string.h>
+#include <stddef.h>
 #include <zos_errors.h>
 #include <zos_sys.h>
 #include <zos_video.h>
 #include <zos_vfs.h>
+#include <zvb_hardware.h>
+#include <core.h>
 #include <keyboard.h>
-#include <ansi.h>
 
 #include "config.h"
 #include "common.h"
@@ -22,20 +24,24 @@ static zos_stat_t zos_stat;
 
 void prompt(char *cmd) {
     setcolor(TEXT_COLOR_LIGHT_GRAY, TEXT_COLOR_BLACK);
-    printf("\r%s", cwd.drive);
-    if(cwd.truncated) printf("/...");
-    printf("%s> ", cwd.folder);
+    // printf("\r%s", cwd.drive);
+    put_c(CH_RETURN);
+    put_s(cwd.drive);
+    if(cwd.truncated) put_s("/...");
+    // printf("%s> ", cwd.folder);
+    put_s(cwd.folder);
+    put_c('>');
     if(cmd != NULL) {
-        printf("%s", cmd);
+        put_s(cmd);
     }
     fflush_stdout();
     setcolor(TEXT_COLOR_WHITE, TEXT_COLOR_BLACK);
 }
 
 void clear_command(void) {
-    printf("\r");
+    put_c(CH_RETURN);
     for(uint8_t i = 0; i < pos+4; i++) {
-        printf(" ");
+        put_c(CH_SPACE);
     }
     buffer[0] = CH_NULL;
     pos = 0;
@@ -47,14 +53,14 @@ void use_history(HistoryNode *node) {
     clear_command();
     prompt(node->str);
     fflush_stdout();
-    strncpy(buffer, node->str, COMMAND_MAX - 1);
+    str_cpyn(buffer, node->str, COMMAND_MAX - 1);
     buffer[COMMAND_MAX - 1] = CH_NULL;
-    pos = strlen(buffer);
+    pos = str_len(buffer);
 }
 
 void usage(void) {
-    printf("usage: zshell [-options] [path]\n");
-    printf("   q - quiet mode\n");
+    put_s("usage: zshell [-options] [path]\n");
+    put_s("   q - quiet mode\n");
 }
 
 batch_options_e parse_args(char **argv, char *path) {
@@ -77,7 +83,10 @@ batch_options_e parse_args(char **argv, char *path) {
                 case CH_SPACE:
                     goto parsed;
                 default: {
-                    printf("Invalid option: %s\n", *params);
+                    // printf("Invalid option: %s\n", *params);
+                    put_s("Invalid option: ");
+                    put_s(params);
+                    put_c(CH_NEWLINE);
                     usage();
                     return ERR_INVALID_PARAMETER;
                 } break;
@@ -88,7 +97,7 @@ batch_options_e parse_args(char **argv, char *path) {
 parsed:
     while(*params == CH_SPACE) params++;
     if(*params != 0) {
-        strcpy(path, params);
+        str_cpy(path, params);
     }
     return options;
 }
@@ -100,7 +109,7 @@ int main(int argc, char **argv) {
     for(uint8_t i = 0; i < MAX_PATHS; i++) {
         paths[i][0] = CH_NULL;
     }
-    strcpy(paths[0], "A:/");
+    str_cpy(paths[0], "A:/");
 
     if(argc == 1) {
         char path[PATH_MAX];
@@ -109,14 +118,17 @@ int main(int argc, char **argv) {
         return err;
     }
 
-    run("ver"); printf("\n");
+    run("ver"); put_c(CH_NEWLINE);
 
 #if AUTOEXEC_ENABLED
     err = stat(AUTOEXEC_FILENAME, &zos_stat);
     if(!err) {
         batch_process(AUTOEXEC_FILENAME, BATCH_QUIET);
     } else {
-        printf("Could not load %s\n", AUTOEXEC_FILENAME);
+        // printf("Could not load %s\n", AUTOEXEC_FILENAME);
+        put_s("Could not load ");
+        put_s(AUTOEXEC_FILENAME);
+        put_c(CH_NEWLINE);
     }
 #endif
 
@@ -169,7 +181,7 @@ int main(int argc, char **argv) {
 #endif
 
                 case KB_KEY_ENTER: {
-                    printf("\n");
+                    put_c(CH_NEWLINE);
                     if(pos < 1) goto end_outer_loop;
                     buffer[pos] = CH_NULL;
 #if HISTORY_ENABLED
@@ -197,7 +209,7 @@ int main(int argc, char **argv) {
                     unsigned char c = getch(key);
                     if(c < 0x20 || c > 0x7D) break; // unprintable
                     buffer[pos++] = c;
-                    printf("%c", c);
+                    put_c(c);
                     fflush_stdout();
                 } break;
             }
@@ -208,6 +220,6 @@ quit:
 
     err = kb_mode_default();
     handle_error(err, "reset keyboard", 1);
-    printf("\n");
+    put_c(CH_NEWLINE);
     return 0;
 }

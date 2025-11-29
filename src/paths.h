@@ -1,7 +1,6 @@
 #ifndef PATHS_H
 #define PATHS_H
 
-#include <stdio.h>
 #include <stdint.h>
 #include <zos_errors.h>
 #include <zos_vfs.h>

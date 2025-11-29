@@ -21,15 +21,18 @@ include($ENV{ZOS_PATH}/cmake/zos_init.cmake)
 zos_use(zvb)
 find_package(ZVB_SDK REQUIRED)
 
+zos_use(coreutils)
+find_package(COREUTILS REQUIRED)
+
 # When using CMake as a build system, it's possible to mix ASM and C in the compilation
-project(zshell C ASM)
+project(${target_name} C ASM)
 
 # Include menuconfig support (optional)
 if(EXISTS ${CMAKE_CURRENT_LIST_DIR}/menuconfig.cmake)
     include(${CMAKE_CURRENT_LIST_DIR}/menuconfig.cmake)
 endif()
 
-add_executable(zshell
+add_executable(${target_name}
     "src/main.c"
     "src/common.c"
     "src/history.c"
@@ -39,21 +42,22 @@ add_executable(zshell
     "src/process.c"
 )
 
-target_include_directories(zshell PRIVATE $ENV{ZVB_SDK_PATH}/include)
-target_include_directories(zshell PRIVATE ${CMAKE_CURRENT_LIST_DIR}/include)
-
-# Add library directory before linking
-target_link_directories(zshell PRIVATE ${CMAKE_CURRENT_LIST_DIR}/lib)
+target_include_directories(${target_name} PRIVATE $ENV{ZVB_SDK_PATH}/include)
+target_include_directories(${target_name} PRIVATE ${CMAKE_CURRENT_LIST_DIR}/include)
 
 # Link with .lib extension for SDCC
-target_link_libraries(zshell zvb_gfx keyboard.lib ansi.lib)
+target_link_libraries(${target_name} zvb_gfx core keyboard)
+
+target_compile_options(${target_name} PRIVATE
+    $<$<COMPILE_LANGUAGE:C>:--nostdlib>
+)
 
 # Add menuconfig support to the zshell target (if available)
 if(COMMAND add_menuconfig_support)
-    add_menuconfig_support(zshell)
+    add_menuconfig_support(${target_name})
 endif()
 
-zos_add_outputs(zshell)
+zos_add_outputs(${target_name})
 
 # Copy the .zs scripts over (only if they exist at build time)
 add_custom_command(TARGET ${target_name}_bin POST_BUILD
@@ -99,4 +103,4 @@ add_custom_target(increment_build_number
 )
 
 # Make zshell depend on the version increment
-add_dependencies(zshell increment_build_number)
+add_dependencies(${target_name} increment_build_number)

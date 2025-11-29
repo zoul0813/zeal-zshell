@@ -1,10 +1,11 @@
-#include <stdio.h>
+// #include <stdio.h>
+// #include <string.h>
 #include <stdint.h>
-#include <string.h>
 #include <zos_errors.h>
 #include <zos_sys.h>
 #include <zos_vfs.h>
 #include <zos_video.h>
+#include <core.h>
 
 #include "common.h"
 #include "batch.h"
@@ -20,7 +21,12 @@ zos_err_t batch_process(const char* path, batch_options_e options) {
 
     zos_dev_t f = open(path, O_RDONLY);
     if(f < 0) {
-        printf("ERROR[%02x]: could not open %s\n", -f, path);
+        // printf("ERROR[%02x]: could not open %s\n", -f, path);
+        put_s("ERROR[");
+        put_hex(-f);
+        put_s("]: could not open ");
+        put_s(path);
+        put_c(CH_NEWLINE);
         return -f;
     }
 
@@ -30,11 +36,19 @@ zos_err_t batch_process(const char* path, batch_options_e options) {
     zos_err_t err = read(f, buffer, &size);
     close(f);
     if(err) {
-        printf("ERROR[%02x]: could not read %s\n", err, path);
+        // printf("ERROR[%02x]: could not read %s\n", err, path);
+        put_s("ERROR[");
+        put_hex(err);
+        put_s("]: could not read ");
+        put_s(path);
+        put_c(CH_NEWLINE);
         return err;
     }
     if(size < 1) {
-        printf("ERROR: %d bytes read\n", size);
+        // printf("ERROR: %d bytes read\n", size);
+        put_s("ERROR: ");
+        put_u16(size);
+        put_s(" bytes read\n");
         return ERR_SUCCESS;
     }
 
@@ -53,7 +67,7 @@ zos_err_t batch_process(const char* path, batch_options_e options) {
 
         if(c == CH_NEWLINE || size == 1) {
             line[pos] = CH_NULL;
-            if(strlen(line) > 0) {
+            if(str_len(line) > 0) {
                 if(line[0] == BATCH_COMMENT) goto next_line;
 
                 char *cmd = line;
@@ -78,7 +92,10 @@ zos_err_t batch_process(const char* path, batch_options_e options) {
 
                 if(!(options && BATCH_QUIET)) {
                     setcolor(TEXT_COLOR_LIGHT_GRAY, TEXT_COLOR_BLACK);
-                    printf("> %s\n", line);
+                    // printf("> %s\n", line);
+                    put_s("> ");
+                    put_s(line);
+                    put_c(CH_NEWLINE);
                     setcolor(TEXT_COLOR_WHITE, TEXT_COLOR_BLACK);
                 }
 

@@ -1,8 +1,10 @@
-#include <stdio.h>
+// #include <stdio.h>
+#include <stddef.h>
 #include <stdint.h>
 #include <zos_errors.h>
 #include <zos_sys.h>
 #include <zos_video.h>
+#include <core.h>
 #include "config.h"
 #include "common.h"
 
@@ -51,12 +53,21 @@ int __exit(zos_err_t err) {
 void print_error(uint8_t code) {
     uint8_t c = code;
     if(c >= ERROR_STRINGS_LEN) c = ERROR_STRINGS_LEN-1;
-    printf("ERROR($%02X): %s\n", code, ERROR_STRINGS[c]);
+    // printf("ERROR($%02X): %s\n", code, ERROR_STRINGS[c]);
+    put_s("ERROR($");
+    put_hex(code);
+    put_s("): ");
+    put_s(ERROR_STRINGS[c]);
+    put_c(CH_NEWLINE);
 }
 
 void handle_error(zos_err_t err, char *msg, uint8_t fatal) {
   if(err != ERR_SUCCESS) {
-    if(msg != NULL) printf("failed to %s, ", msg);
+    if(msg != NULL) {
+        put_s("failed to ");
+        put_s(msg);
+        put_s(", ");
+    }
     print_error(err);
     if(fatal) __exit(err);
   }

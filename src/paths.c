@@ -1,6 +1,7 @@
-#include <stdio.h>
-#include <string.h>
+// #include <stdio.h>
+// #include <string.h>
 #include <zos_errors.h>
+#include <core.h>
 
 #include "common.h"
 #include "paths.h"
@@ -8,7 +9,7 @@
 void path_set(dir_t* dir, char* path)
 {
     dir->truncated = 0;
-    strncpy(dir->path, path, PATH_MAX - 1);
+    str_cpyn(dir->path, path, PATH_MAX - 1);
     dir->path[PATH_MAX - 1] = CH_NULL;
 
     // Find drive (up to and including DRIVE_SEP)
@@ -16,7 +17,7 @@ void path_set(dir_t* dir, char* path)
     while (*p && *p != DRIVE_SEP) p++;
     if (*p == DRIVE_SEP)
         p++;
-    strncpy(dir->drive, dir->path, p - dir->path);
+    str_cpyn(dir->drive, dir->path, p - dir->path);
     dir->drive[p - dir->path] = CH_NULL;
 
     // Start from after the drive, skip leading slash
@@ -49,7 +50,7 @@ void path_set(dir_t* dir, char* path)
 
     // Build folder path
     dir->folder[0] = PATH_SEP;
-    strcpy(dir->folder + 1, truncate_point == end ? folder_start : truncate_point + 1);
+    str_cpy(dir->folder + 1, truncate_point == end ? folder_start : truncate_point + 1);
 }
 
 zos_err_t path_set_cwd(dir_t* dir)

@@ -1,7 +1,6 @@
 #ifndef HISTORY_H
 #define HISTORY_H
 
-#include <stdio.h>
 #include <stdint.h>
 #include "config.h"
 

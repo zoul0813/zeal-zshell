@@ -1,9 +1,10 @@
-#include <stdio.h>
+// #include <stdio.h>
+// #include <string.h>
 #include <stdint.h>
-#include <string.h>
 #include <zos_sys.h>
 #include <zos_vfs.h>
 #include <zos_video.h>
+#include <core.h>
 
 #include "config.h"
 #include "common.h"
@@ -19,13 +20,15 @@ static zos_err_t retval;
 static uint8_t cmd_hash(char* args)
 {
     (void*) args;
-    printf("%d\n", retval);
+    // printf("%d\n", retval);
+    put_u8(retval);
+    put_c(CH_NEWLINE);
     return ERR_SUCCESS;
 }
 
 static uint8_t cmd_cd(char* args)
 {
-    uint8_t l = strlen(args);
+    uint8_t l = str_len(args);
     if (args[l - 1] != PATH_SEP) {
         args[l]     = PATH_SEP;
         args[l + 1] = CH_NULL;
@@ -39,7 +42,9 @@ static uint8_t cmd_cd(char* args)
 static uint8_t cmd_pwd(char* args)
 {
     (void*) args;
-    printf("%s\n", cwd.path);
+    // printf("%s\n", cwd.path);
+    put_s(cwd.path);
+    put_c(CH_NEWLINE);
     return ERR_SUCCESS;
 }
 
@@ -54,7 +59,10 @@ static uint8_t cmd_history(char* args)
     (void*) args;
     HistoryNode* node = history.tail;
     while (node) {
-        printf("  %s\n", node->str);
+        // printf("  %s\n", node->str);
+        put_s("  ");
+        put_s(node->str);
+        put_c(CH_NEWLINE);
         node = node->prev;
     }
     return ERR_SUCCESS;
@@ -69,16 +77,19 @@ static uint8_t cmd_clear(char* args)
 zos_err_t set_path(char *path, char* str, size_t len) {
     char value[PATH_MAX] = "";
     if(len >= PATH_MAX) {
-        printf("ERROR: Path too long: %s\n", str);
+        // printf("ERROR: Path too long: %s\n", str);
+        put_s("ERROR: Path too long: ");
+        put_s(str);
+        put_c(CH_NEWLINE);
         return ERR_INVALID_PATH;
     }
-    strncpy(value, str, len);
+    str_cpyn(value, str, len);
     if(value[len-1] != PATH_SEP) {
         value[len] = PATH_SEP;
         len++;
     }
     value[len] = CH_NULL;
-    strncpy(path, value, PATH_MAX);
+    str_cpyn(path, value, PATH_MAX);
     return ERR_SUCCESS;
 }
 
@@ -87,16 +98,23 @@ static uint8_t cmd_set(char* args)
     char name[FILENAME_LEN_MAX] = "";
     zos_err_t err = ERR_SUCCESS;
 
-    char *equals = strchr(args, '=');
+    char *equals = str_chr(args, '=');
     if(!equals) {
-        if(strcmp(args, "PATH") == 0) {
+        if(str_cmp(args, "PATH") == 0) {
             for(uint8_t i = 0; i < MAX_PATHS; i++) {
                 if(paths[i][0] == CH_NULL) break;
-                printf("%d: %s\n", i, paths[i]);
+                // printf("%d: %s\n", i, paths[i]);
+                put_u8(i);
+                put_c(CH_SPACE);
+                put_s(paths[i]);
+                put_c(CH_NEWLINE);
             }
             return ERR_SUCCESS;
         } else {
-            printf("ERROR: Unknown variable: %s\n", args);
+            // printf("ERROR: Unknown variable: %s\n", args);
+            put_s("ERROR: Unknown variable: ");
+            put_s(args);
+            put_c(CH_NEWLINE);
             return ERR_INVALID_PARAMETER;
         }
     }
@@ -109,19 +127,30 @@ static uint8_t cmd_set(char* args)
             case '=': {
                 // will hit this condition if we encounter a second "="
                 if(name[0] != CH_NULL) {
-                    printf("ERROR: Invalid set: %s\n", args);
+                    // printf("ERROR: Invalid set: %s\n", args);
+                    put_s("ERROR: Invalid set: ");
+                    put_s(args);
+                    put_c(CH_NEWLINE);
                     return ERR_INVALID_PARAMETER;
                 }
                 size_t l = p - s;
                 if(l >= FILENAME_LEN_MAX) {
-                    printf("ERROR: Invalid variable length: %d, max %d\n", l, FILENAME_LEN_MAX);
+                    // printf("ERROR: Invalid variable length: %d, max %d\n", l, FILENAME_LEN_MAX);
+                    put_s("ERROR: Invalid variable length: ");
+                    put_u16(l);
+                    put_s(", max ");
+                    put_u16(FILENAME_LEN_MAX);
+                    put_c(CH_NEWLINE);
                     return ERR_INVALID_PARAMETER;
                 }
-                strncpy(name, s, l);
+                str_cpyn(name, s, l);
                 name[l] = CH_NULL;
 
-                if(strncmp(name, "PATH", FILENAME_LEN_MAX) != 0) {
-                    printf("ERROR: Invalid variable name: %s\n", name);
+                if(str_cmpn(name, "PATH", FILENAME_LEN_MAX) != 0) {
+                    // printf("ERROR: Invalid variable name: %s\n", name);
+                    put_s("ERROR: Invalid variable name: ");
+                    put_s(name);
+                    put_c(CH_NEWLINE);
                     return ERR_INVALID_PARAMETER;
                 }
 
@@ -134,7 +163,10 @@ static uint8_t cmd_set(char* args)
             case ',': {
                 // encountered the comma before setting the var name
                 if(name[0] == CH_NULL) {
-                    printf("ERROR: Invalid set: %s\n", args);
+                    // printf("ERROR: Invalid set: %s\n", args);
+                    put_s("ERROR: Invalid set: ");
+                    put_s(args);
+                    put_c(CH_NEWLINE);
                     return ERR_INVALID_PARAMETER;
                 }
                 size_t l = p - s;
@@ -160,7 +192,7 @@ static uint8_t cmd_which(char* args)
     char* search_name = args;
 
     // Check if it starts with ./
-    if (strlen(args) > 2 && args[0] == '.' && args[1] == PATH_SEP) {
+    if (str_len(args) > 2 && args[0] == '.' && args[1] == PATH_SEP) {
         shallow = 1;
         search_name = &args[2];  // Strip the ./ prefix
     }
@@ -168,8 +200,11 @@ static uint8_t cmd_which(char* args)
     // Only check builtins if not using ./
     if (!shallow) {
         for (int i = 0; builtins[i].handler != NULL; i++) {
-            if (strcmp(search_name, builtins[i].name) == 0) {
-                printf("built-in: %s\n", search_name);
+            if (str_cmp(search_name, builtins[i].name) == 0) {
+                // printf("built-in: %s\n", search_name);
+                put_s("built-in: ");
+                put_s(search_name);
+                put_c(CH_NEWLINE);
                 return ERR_SUCCESS;
             }
         }
@@ -177,11 +212,13 @@ static uint8_t cmd_which(char* args)
 
     // Need to copy to a mutable buffer since find_exec modifies it
     char cmd[PATH_MAX];
-    strncpy(cmd, search_name, PATH_MAX);
+    str_cpyn(cmd, search_name, PATH_MAX);
 
     zos_err_t err = find_exec(cmd, shallow);
     if (err) return ERR_NO_SUCH_ENTRY;
-    printf("%s\n", cmd);
+    // printf("%s\n", cmd);
+    put_s(cmd);
+    put_c(CH_NEWLINE);
     return ERR_SUCCESS;
 }
 
@@ -200,11 +237,18 @@ static uint8_t cmd_false(char* args)
 static uint8_t cmd_ver(char* args)
 {
     (void*) args;
-    printf("%s v%s-%d\n", APP_NAME, APP_VERSION_STRING, APP_VERSION_BUILD);
+    // printf("%s v%s-%d\n", APP_NAME, APP_VERSION_STRING, APP_VERSION_BUILD);
+    put_s(APP_NAME);
+    put_c(CH_SPACE);
+    put_s(APP_VERSION_STRING);
+    put_c('-');
+    put_u8(APP_VERSION_BUILD);
+    put_c(CH_NEWLINE);
     return ERR_SUCCESS;
 }
 
 static uint8_t cmd_reset(char * args) {
+    (void*)args;
     __asm__(
         "rst 0\n"
     );
@@ -231,7 +275,7 @@ const builtin_t builtins[] = {
 uint8_t builtin(char* cmd, char* args)
 {
     for (int i = 0; builtins[i].handler != NULL; i++) {
-        if (strcmp(cmd, builtins[i].name) == 0) {
+        if (str_cmp(cmd, builtins[i].name) == 0) {
             return builtins[i].handler(args);
         }
     }
