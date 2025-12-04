@@ -1,0 +1,12 @@
+# ZShell Interactive Demo
+
+This is a preview of Zeal 8-bit OS with ZShell and coreutils preinstalled.
+
+There are a number of apps, games, etc on T:/
+
+Things to try:
+
+`tree` - the tree command is new to coreutils
+`setfont t:/sys/CAFE.f12` - setfont is new to coreutils, some fonts are available in T:/sys/
+`zc` - Zeal Commander is a text-mode UI for browsing your system.
+
