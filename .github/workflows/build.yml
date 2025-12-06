@@ -36,12 +36,6 @@ jobs:
         run: |
           zde cmake && zde romdisk add bin/zshell
 
-      - name: Checkout ZOS coreutils branch
-        run: |
-          cd $ZDE_PATH/home/Zeal-8-bit-OS
-          git fetch origin feature/coreutils-romdisk
-          git checkout feature/coreutils-romdisk
-
       - name: Create eeprom.img
         run: |
           cp ${{ github.workspace }}/.deploy/eeprom/* $ZDE_PATH/mnt/eeprom/
