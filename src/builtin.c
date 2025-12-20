@@ -8,7 +8,9 @@
 
 #include "config.h"
 #include "common.h"
+#include "keyboard.h"
 #include "paths.h"
+#include "batch.h"
 #include "history.h"
 #include "process.h"
 #include "builtin.h"
@@ -74,9 +76,10 @@ static uint8_t cmd_clear(char* args)
     return ioctl(DEV_STDOUT, CMD_RESET_SCREEN, NULL);
 }
 
-zos_err_t set_path(char *path, char* str, size_t len) {
+zos_err_t set_path(char* path, char* str, size_t len)
+{
     char value[PATH_MAX] = "";
-    if(len >= PATH_MAX) {
+    if (len >= PATH_MAX) {
         // printf("ERROR: Path too long: %s\n", str);
         put_s("ERROR: Path too long: ");
         put_s(str);
@@ -84,7 +87,7 @@ zos_err_t set_path(char *path, char* str, size_t len) {
         return ERR_INVALID_PATH;
     }
     str_cpyn(value, str, len);
-    if(value[len-1] != PATH_SEP) {
+    if (value[len - 1] != PATH_SEP) {
         value[len] = PATH_SEP;
         len++;
     }
@@ -96,13 +99,14 @@ zos_err_t set_path(char *path, char* str, size_t len) {
 static uint8_t cmd_set(char* args)
 {
     char name[FILENAME_LEN_MAX] = "";
-    zos_err_t err = ERR_SUCCESS;
+    zos_err_t err               = ERR_SUCCESS;
 
-    char *equals = str_chr(args, '=');
-    if(!equals) {
-        if(str_cmp(args, "PATH") == 0) {
-            for(uint8_t i = 0; i < MAX_PATHS; i++) {
-                if(paths[i][0] == CH_NULL) break;
+    char* equals = str_chr(args, '=');
+    if (!equals) {
+        if (str_cmp(args, "PATH") == 0) {
+            for (uint8_t i = 0; i < MAX_PATHS; i++) {
+                if (paths[i][0] == CH_NULL)
+                    break;
                 // printf("%d: %s\n", i, paths[i]);
                 put_u8(i);
                 put_c(CH_SPACE);
@@ -119,14 +123,14 @@ static uint8_t cmd_set(char* args)
         }
     }
 
-    char *p = args;
-    char *s = args;
+    char* p   = args;
+    char* s   = args;
     uint8_t i = 0;
-    while(*p != CH_NULL) {
-        switch(*p) {
+    while (*p != CH_NULL) {
+        switch (*p) {
             case '=': {
                 // will hit this condition if we encounter a second "="
-                if(name[0] != CH_NULL) {
+                if (name[0] != CH_NULL) {
                     // printf("ERROR: Invalid set: %s\n", args);
                     put_s("ERROR: Invalid set: ");
                     put_s(args);
@@ -134,7 +138,7 @@ static uint8_t cmd_set(char* args)
                     return ERR_INVALID_PARAMETER;
                 }
                 size_t l = p - s;
-                if(l >= FILENAME_LEN_MAX) {
+                if (l >= FILENAME_LEN_MAX) {
                     // printf("ERROR: Invalid variable length: %d, max %d\n", l, FILENAME_LEN_MAX);
                     put_s("ERROR: Invalid variable length: ");
                     put_u16(l);
@@ -146,7 +150,7 @@ static uint8_t cmd_set(char* args)
                 str_cpyn(name, s, l);
                 name[l] = CH_NULL;
 
-                if(str_cmpn(name, "PATH", FILENAME_LEN_MAX) != 0) {
+                if (str_cmpn(name, "PATH", FILENAME_LEN_MAX) != 0) {
                     // printf("ERROR: Invalid variable name: %s\n", name);
                     put_s("ERROR: Invalid variable name: ");
                     put_s(name);
@@ -154,7 +158,7 @@ static uint8_t cmd_set(char* args)
                     return ERR_INVALID_PARAMETER;
                 }
 
-                for(uint8_t j = 0; j < MAX_PATHS; j++) {
+                for (uint8_t j = 0; j < MAX_PATHS; j++) {
                     paths[j][0] = CH_NULL;
                 }
 
@@ -162,7 +166,7 @@ static uint8_t cmd_set(char* args)
             } break;
             case ',': {
                 // encountered the comma before setting the var name
-                if(name[0] == CH_NULL) {
+                if (name[0] == CH_NULL) {
                     // printf("ERROR: Invalid set: %s\n", args);
                     put_s("ERROR: Invalid set: ");
                     put_s(args);
@@ -170,17 +174,18 @@ static uint8_t cmd_set(char* args)
                     return ERR_INVALID_PARAMETER;
                 }
                 size_t l = p - s;
-                err = set_path(paths[i], s, l);
-                if(err) return err;
+                err      = set_path(paths[i], s, l);
+                if (err)
+                    return err;
                 s = p + 1;
                 i++;
             }
         }
         p++;
     }
-    if(p > s) {
+    if (p > s) {
         size_t l = p - s;
-        err = set_path(paths[i], s, l);
+        err      = set_path(paths[i], s, l);
     }
 
     return err;
@@ -188,13 +193,13 @@ static uint8_t cmd_set(char* args)
 
 static uint8_t cmd_which(char* args)
 {
-    uint8_t shallow = 0;
+    uint8_t shallow   = 0;
     char* search_name = args;
 
     // Check if it starts with ./
     if (str_len(args) > 2 && args[0] == '.' && args[1] == PATH_SEP) {
-        shallow = 1;
-        search_name = &args[2];  // Strip the ./ prefix
+        shallow     = 1;
+        search_name = &args[2]; // Strip the ./ prefix
     }
 
     // Only check builtins if not using ./
@@ -215,7 +220,8 @@ static uint8_t cmd_which(char* args)
     str_cpyn(cmd, search_name, PATH_MAX);
 
     zos_err_t err = find_exec(cmd, shallow);
-    if (err) return ERR_NO_SUCH_ENTRY;
+    if (err)
+        return ERR_NO_SUCH_ENTRY;
     // printf("%s\n", cmd);
     put_s(cmd);
     put_c(CH_NEWLINE);
@@ -247,13 +253,22 @@ static uint8_t cmd_ver(char* args)
     return ERR_SUCCESS;
 }
 
-static uint8_t cmd_reset(char * args) {
-    (void*)args;
-    __asm__(
-        "rst 0\n"
-    );
+static uint8_t cmd_reset(char* args)
+{
+    (void*) args;
+    __asm__("rst 0\n");
     return 0;
 }
+
+static uint8_t cmd_exec(char* args)
+{
+    put_s("exec '");
+    put_s(args);
+    put_s("'\n");
+    return run(args);
+}
+
+static uint8_t cmd_help(char* args); // declare it
 
 // Lookup table
 const builtin_t builtins[] = {
@@ -261,6 +276,8 @@ const builtin_t builtins[] = {
     {     "cd",      cmd_cd},
     {    "pwd",     cmd_pwd},
     {   "exit",    cmd_exit},
+    {   "help",    cmd_help},
+    {   "exec",    cmd_exec},
     {"history", cmd_history},
     {  "clear",   cmd_clear},
     {    "set",     cmd_set},
@@ -271,6 +288,17 @@ const builtin_t builtins[] = {
     {  "reset",   cmd_reset},
     {       "",        NULL}  // sentinel
 };
+const uint8_t builtsin_len = sizeof(builtins) / sizeof(builtin_t);
+
+
+static uint8_t cmd_help(char* args) {
+    (void*)args;
+    for(uint8_t i = 0; i < builtsin_len; i++) {
+        put_s(builtins[i].name);
+        put_c(CH_NEWLINE);
+    }
+    return 0;
+}
 
 uint8_t builtin(char* cmd, char* args)
 {

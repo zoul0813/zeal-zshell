@@ -19,14 +19,15 @@
 
 static zos_err_t retval;
 
-static zos_err_t find_with_extension(unsigned char* name, const char* extension, uint8_t shallow, unsigned char* result_path)
+static zos_err_t find_with_extension(unsigned char* name, const char* extension, uint8_t shallow,
+                                     unsigned char* result_path)
 {
     zos_stat_t zos_stat;
     unsigned char path[PATH_MAX];
     zos_err_t err;
 
     // Try in current location first
-    if(shallow) {
+    if (shallow) {
         str_cpyn(path, name, PATH_MAX);
         if (extension && str_len(extension) > 0) {
             str_catn(path, extension, PATH_MAX - str_len(path) - 1);
@@ -116,6 +117,9 @@ zos_err_t run(const char* arg)
         shallow = 1;
         str_cpyn(cmd, &arg[2], PATH_MAX);
     } else {
+        if (l > 3 && arg[1] == ':' && arg[2] == PATH_SEP) {
+            shallow = 1;
+        }
         str_cpyn(cmd, arg, PATH_MAX);
     }
 
@@ -130,9 +134,10 @@ zos_err_t run(const char* arg)
         }
     }
 
-    if(!shallow) {
+    if (!shallow) {
         err = builtin(cmd, args);
-        if (err != 0xFF) return err;
+        if (err != 0xFF)
+            return err;
     }
 
     err = find_exec(cmd, shallow);
