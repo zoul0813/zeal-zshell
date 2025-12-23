@@ -10,9 +10,6 @@
 #define CH_NEWLINE '\n'
 #define CH_SPACE   ' '
 
-// put a 4K buffer at the top of page 3
-char __at(0xB000) aligned_buffer[1024 * 4];
-
 extern dir_t cwd;
 extern char paths[MAX_PATHS][PATH_MAX];
 

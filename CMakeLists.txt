@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.16)
 # Application Version
 set(APP_VERSION_MAJOR 0)
 set(APP_VERSION_MINOR 1)
-set(APP_VERSION_PATCH 0)
+set(APP_VERSION_PATCH 1)
 set(APP_NAME "ZShell")
 set(target_name "zshell")
 

@@ -53,7 +53,6 @@ int __exit(zos_err_t err) {
 void print_error(uint8_t code) {
     uint8_t c = code;
     if(c >= ERROR_STRINGS_LEN) c = ERROR_STRINGS_LEN-1;
-    // printf("ERROR($%02X): %s\n", code, ERROR_STRINGS[c]);
     put_s("ERROR($");
     put_hex(code);
     put_s("): ");

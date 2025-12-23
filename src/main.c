@@ -24,11 +24,9 @@ static zos_stat_t zos_stat;
 
 void prompt(char *cmd) {
     setcolor(TEXT_COLOR_LIGHT_GRAY, TEXT_COLOR_BLACK);
-    // printf("\r%s", cwd.drive);
     put_c(CH_RETURN);
     put_s(cwd.drive);
     if(cwd.truncated) put_s("/...");
-    // printf("%s> ", cwd.folder);
     put_s(cwd.folder);
     put_c('>');
     if(cmd != NULL) {
@@ -83,7 +81,6 @@ batch_options_e parse_args(char **argv, char *path) {
                 case CH_SPACE:
                     goto parsed;
                 default: {
-                    // printf("Invalid option: %s\n", *params);
                     put_s("Invalid option: ");
                     put_s(params);
                     put_c(CH_NEWLINE);
@@ -125,7 +122,6 @@ int main(int argc, char **argv) {
     if(!err) {
         batch_process(AUTOEXEC_FILENAME, BATCH_QUIET);
     } else {
-        // printf("Could not load %s\n", AUTOEXEC_FILENAME);
         put_s("Could not load ");
         put_s(AUTOEXEC_FILENAME);
         put_c(CH_NEWLINE);
