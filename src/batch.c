@@ -52,6 +52,13 @@ zos_err_t batch_process(const char* path, batch_options_e options) {
         return ERR_SUCCESS;
     }
 
+    // Copy to local buffer, so batch_process can be called multiple times
+    // (ie; autoexec.zs execs h:/test.zs)
+    // TODO: limits apply, we'll run out of stack space if we allow too much nesting
+    char local[sizeof(aligned_buffer)];
+    mem_cpy(local, buffer, sizeof(aligned_buffer));
+    buffer = local;
+
     // TODO: add option to "set quiet=1" for options |= BATCH_QUIET
 
     uint8_t *p = &buffer[0];
