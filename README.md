@@ -87,7 +87,7 @@ cat a:/notafile
 
 ZShell can be configured to load an autoexec script at whatever path you prefer when compiling.
 
-The default is `b:/autoexex.zs`
+The default is `b:/autoexec.zs`
 
 The purpose of this script is to set your initial `PATH` variable, but it can also be used to perform
 common "boot" operations - such as changing your display font with [setfont](https://github.com/zoul0813/zeal-coreutils?tab=readme-ov-file#setfont),
