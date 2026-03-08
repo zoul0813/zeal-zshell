@@ -20,17 +20,9 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Setup ZDE
-        uses: zoul0813/zeal-dev-environment/github/setup-zde@main
-
-      - name: Initialize mounts
-        run: |
-          mkdir -p $ZDE_PATH/mnt/romdisk
-          mkdir -p $ZDE_PATH/mnt/eeprom
-          mkdir -p $ZDE_PATH/mnt/roms
-
-      - name: Build coreutils
-        run: |
-          cd $ZDE_PATH/home/zeal-coreutils && zde cmake && zde romdisk add bin
+        uses: zoul0813/zeal-dev-environment/github/setup-zde@feature/zde-py
+        with:
+            deps: coreutils zealfs
 
       - name: Build with ZDE
         run: |
@@ -38,8 +30,8 @@ jobs:
 
       - name: Create eeprom.img
         run: |
-          cp ${{ github.workspace }}/.deploy/eeprom/* $ZDE_PATH/mnt/eeprom/
-          zde image eeprom 64 # custom eeprom image
+          zde image eeprom add "${{ github.workspace }}/.deploy/eeprom"
+          zde image eeprom create 64 # custom eeprom image
           cp $ZDE_PATH/mnt/eeprom.img ${{ github.workspace }}/.deploy/eeprom.img
 
       - name: Build Kernel/Romdisk
