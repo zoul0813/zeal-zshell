@@ -13,15 +13,20 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: zeal-dev-environment/home/extras/zoul0813/zeal-zshell
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
       - name: Setup ZDE
         uses: zoul0813/zeal-dev-environment/github/setup-zde@main
         with:
-          deps: coreutils zealfs
+          deps: zealfs zshell
+
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+            path: zeal-dev-environment/home/extras/zoul0813/zeal-zshell
 
       - name: Stage coreutils
         run: |
@@ -35,23 +40,14 @@ jobs:
         run: |
           zde image eeprom add .deploy/eeprom
           zde image eeprom create 64 # custom eeprom image
-          cp $ZDE_PATH/mnt/eeprom.img ${{ github.workspace }}/.deploy/eeprom.img
+          cp $ZDE_PATH/mnt/eeprom.img .deploy/eeprom.img
 
       - name: Build Kernel/Romdisk
-        env:
-          ZDE_USER_PATH: ${{ github.workspace }}/.deploy
         run: |
-          zde kernel user
-          cp $ZDE_PATH/home/Zeal-8-bit-OS/build/os_with_romdisk.img bin/default.img
+          zde kernel zoul0813/zeal-zshell/emu
           cp $ZDE_PATH/home/Zeal-8-bit-OS/build/os_with_romdisk.img .deploy/default.img
 
       - name: Deploy
-        uses: ./.github/actions/deploy-pages
-
-      # - name: Upload binaries
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: zshell-binaries
-      #     path: |
-      #       bin/zshell
-      #       bin/default.img
+        uses: ./zeal-dev-environment/home/extras/zoul0813/zeal-zshell/.github/actions/deploy-pages
+        with:
+            deploy-path: zeal-dev-environment/home/extras/zoul0813/zeal-zshell/.deploy
