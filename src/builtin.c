@@ -76,7 +76,7 @@ static uint8_t cmd_clear(char* args)
 zos_err_t set_path(char* path, char* str, size_t len)
 {
     char value[PATH_MAX] = "";
-    if (len >= PATH_MAX) {
+    if (len == 0 || len >= PATH_MAX || (str[len - 1] != PATH_SEP && len >= PATH_MAX - 1)) {
         put_s("ERROR: Path too long: ");
         put_s(str);
         put_c(CH_NEWLINE);
@@ -88,15 +88,12 @@ zos_err_t set_path(char* path, char* str, size_t len)
         len++;
     }
     value[len] = CH_NULL;
-    str_cpyn(path, value, PATH_MAX);
+    str_cpyn(path, value, len + 1);
     return ERR_SUCCESS;
 }
 
 static uint8_t cmd_set(char* args)
 {
-    char name[FILENAME_LEN_MAX] = "";
-    zos_err_t err               = ERR_SUCCESS;
-
     char* equals = str_chr(args, '=');
     if (!equals) {
         if (str_cmp(args, "PATH") == 0) {
@@ -117,68 +114,56 @@ static uint8_t cmd_set(char* args)
         }
     }
 
-    char* p   = args;
-    char* s   = args;
-    uint8_t i = 0;
-    while (*p != CH_NULL) {
-        switch (*p) {
-            case '=': {
-                // will hit this condition if we encounter a second "="
-                if (name[0] != CH_NULL) {
-                    put_s("ERROR: Invalid set: ");
-                    put_s(args);
-                    put_c(CH_NEWLINE);
-                    return ERR_INVALID_PARAMETER;
-                }
-                size_t l = p - s;
-                if (l >= FILENAME_LEN_MAX) {
-                    put_s("ERROR: Invalid variable length: ");
-                    put_u16(l);
-                    put_s(", max ");
-                    put_u16(FILENAME_LEN_MAX);
-                    put_c(CH_NEWLINE);
-                    return ERR_INVALID_PARAMETER;
-                }
-                str_cpyn(name, s, l);
-                name[l] = CH_NULL;
+    if ((equals - args) != 4 || str_cmpn(args, "PATH", 4) != 0 || equals[1] == CH_NULL) {
+        put_s("ERROR: Invalid set: ");
+        put_s(args);
+        put_c(CH_NEWLINE);
+        return ERR_INVALID_PARAMETER;
+    }
 
-                if (str_cmpn(name, "PATH", FILENAME_LEN_MAX) != 0) {
-                    put_s("ERROR: Invalid variable name: ");
-                    put_s(name);
-                    put_c(CH_NEWLINE);
-                    return ERR_INVALID_PARAMETER;
-                }
-
-                for (uint8_t j = 0; j < MAX_PATHS; j++) {
-                    paths[j][0] = CH_NULL;
-                }
-
-                s = p + 1;
-            } break;
-            case ',': {
-                // encountered the comma before setting the var name
-                if (name[0] == CH_NULL) {
-                    put_s("ERROR: Invalid set: ");
-                    put_s(args);
-                    put_c(CH_NEWLINE);
-                    return ERR_INVALID_PARAMETER;
-                }
-                size_t l = p - s;
-                err      = set_path(paths[i], s, l);
-                if (err)
-                    return err;
-                s = p + 1;
-                i++;
+    // Validate the complete assignment before changing the existing PATH.
+    char* start = equals + 1;
+    char* p = start;
+    uint8_t count = 0;
+    while (1) {
+        if (*p == '=' ) {
+            put_s("ERROR: Invalid set: ");
+            put_s(args);
+            put_c(CH_NEWLINE);
+            return ERR_INVALID_PARAMETER;
+        }
+        if (*p == ',' || *p == CH_NULL) {
+            size_t len = p - start;
+            if (len == 0 || count >= MAX_PATHS || len >= PATH_MAX ||
+                (start[len - 1] != PATH_SEP && len >= PATH_MAX - 1)) {
+                put_s("ERROR: Invalid PATH: ");
+                put_s(args);
+                put_c(CH_NEWLINE);
+                return ERR_INVALID_PARAMETER;
             }
+            count++;
+            if (*p == CH_NULL)
+                break;
+            start = p + 1;
         }
         p++;
     }
-    if (p > s) {
-        size_t l = p - s;
-        err      = set_path(paths[i], s, l);
+
+    for (uint8_t i = 0; i < MAX_PATHS; i++)
+        paths[i][0] = CH_NULL;
+
+    start = equals + 1;
+    for (uint8_t i = 0; i < count; i++) {
+        p = start;
+        while (*p != ',' && *p != CH_NULL)
+            p++;
+        zos_err_t err = set_path(paths[i], start, p - start);
+        if (err)
+            return err;
+        start = p + 1;
     }
 
-    return err;
+    return ERR_SUCCESS;
 }
 
 static uint8_t cmd_which(char* args)
@@ -206,7 +191,11 @@ static uint8_t cmd_which(char* args)
 
     // Need to copy to a mutable buffer since find_exec modifies it
     char cmd[PATH_MAX];
-    str_cpyn(cmd, search_name, PATH_MAX);
+    uint16_t search_len = str_len(search_name);
+    if (search_len >= PATH_MAX)
+        return ERR_PATH_TOO_LONG;
+    str_cpyn(cmd, search_name, search_len);
+    cmd[search_len] = CH_NULL;
 
     zos_err_t err = find_exec(cmd, shallow);
     if (err)

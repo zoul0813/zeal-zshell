@@ -17,7 +17,7 @@
 #include "process.h"
 
 static unsigned char buffer[COMMAND_MAX];
-static uint8_t pos = 0;
+static uint16_t pos = 0;
 static uint16_t size;
 static zos_err_t err;
 static zos_stat_t zos_stat;
@@ -38,7 +38,7 @@ void prompt(char *cmd) {
 
 void clear_command(void) {
     put_c(CH_RETURN);
-    for(uint8_t i = 0; i < pos+4; i++) {
+    for(uint16_t i = 0; i < pos + 4; i++) {
         put_c(CH_SPACE);
     }
     buffer[0] = CH_NULL;
@@ -201,10 +201,11 @@ int main(int argc, char **argv) {
                     zvb_peri_text_curs_x     = x;
                 } break;
                 default: {
-                    // if(pos > COMMAND_MAX - 1) break;
                     unsigned char c = getch(key);
                     if(c < 0x20 || c > 0x7D) break; // unprintable
+                    if(pos >= COMMAND_MAX - 1) break;
                     buffer[pos++] = c;
+                    buffer[pos] = CH_NULL;
                     put_c(c);
                     fflush_stdout();
                 } break;

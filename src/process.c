@@ -19,22 +19,36 @@
 
 static zos_err_t retval;
 
+static zos_err_t copy_checked(unsigned char* dst, const unsigned char* src, uint16_t capacity)
+{
+    uint16_t len = str_len(src);
+    if (len >= capacity)
+        return ERR_PATH_TOO_LONG;
+
+    str_cpyn(dst, src, len);
+    dst[len] = CH_NULL;
+    return ERR_SUCCESS;
+}
+
 static zos_err_t find_with_extension(unsigned char* name, const char* extension, uint8_t shallow,
                                      unsigned char* result_path)
 {
     zos_stat_t zos_stat;
     unsigned char path[PATH_MAX];
     zos_err_t err;
+    uint16_t name_len = str_len(name);
+    uint16_t ext_len = extension ? str_len(extension) : 0;
 
     // Try in current location first
     if (shallow) {
-        str_cpyn(path, name, PATH_MAX);
-        if (extension && str_len(extension) > 0) {
-            str_catn(path, extension, PATH_MAX - str_len(path) - 1);
-        }
+        if (name_len + ext_len >= PATH_MAX)
+            return ERR_PATH_TOO_LONG;
+        str_cpyn(path, name, name_len);
+        str_cpyn(path + name_len, extension, ext_len);
+        path[name_len + ext_len] = CH_NULL;
         err = stat(path, &zos_stat);
         if (!err && D_ISFILE(zos_stat.s_flags)) {
-            str_cpyn(result_path, path, PATH_MAX);
+            copy_checked(result_path, path, PATH_MAX);
             return ERR_SUCCESS;
         }
         return ERR_NO_SUCH_ENTRY;
@@ -45,15 +59,16 @@ static zos_err_t find_with_extension(unsigned char* name, const char* extension,
         if (paths[i][0] == CH_NULL)
             break;
 
-        str_cpyn(path, paths[i], PATH_MAX);
-        int ext_len = (extension && str_len(extension) > 0) ? str_len(extension) : 0;
-        str_catn(path, name, PATH_MAX - str_len(path) - ext_len - 1);
-        if (ext_len > 0) {
-            str_catn(path, extension, PATH_MAX - str_len(path) - 1);
-        }
+        uint16_t base_len = str_len(paths[i]);
+        if (base_len + name_len + ext_len >= PATH_MAX)
+            continue;
+        str_cpyn(path, paths[i], base_len);
+        str_cpyn(path + base_len, name, name_len);
+        str_cpyn(path + base_len + name_len, extension, ext_len);
+        path[base_len + name_len + ext_len] = CH_NULL;
         err = stat(path, &zos_stat);
         if (!err && D_ISFILE(zos_stat.s_flags)) {
-            str_cpyn(result_path, path, PATH_MAX);
+            copy_checked(result_path, path, PATH_MAX);
             return ERR_SUCCESS;
         }
     }
@@ -76,8 +91,7 @@ zos_err_t find_exec(unsigned char* name, uint8_t shallow)
     // Try without extension
     err = find_with_extension(name, "", shallow, path);
     if (!err) {
-        str_cpyn(name, path, PATH_MAX);
-        return ERR_SUCCESS;
+        return copy_checked(name, path, PATH_MAX);
     }
 
     // Only try with extensions if not shallow and the original name doesn't have one
@@ -85,15 +99,13 @@ zos_err_t find_exec(unsigned char* name, uint8_t shallow)
         // Try with .bin extension
         err = find_with_extension(name, ".bin", shallow, path);
         if (!err) {
-            str_cpyn(name, path, PATH_MAX);
-            return ERR_SUCCESS;
+            return copy_checked(name, path, PATH_MAX);
         }
 
         // Try with .zs extension
         err = find_with_extension(name, ".zs", shallow, path);
         if (!err) {
-            str_cpyn(name, path, PATH_MAX);
-            return ERR_SUCCESS;
+            return copy_checked(name, path, PATH_MAX);
         }
     }
 
@@ -104,34 +116,43 @@ zos_err_t run(const char* arg)
 {
     zos_err_t err;
 
-    uint16_t l = str_len(arg);
-
     unsigned char cmd[PATH_MAX];
-    // str_cpyn(cmd, arg, PATH_MAX);
     unsigned char args[PATH_MAX];
-    args[0] = CH_NULL; // init to empty string
+    const unsigned char* command_start = (const unsigned char*)arg;
+    const unsigned char* separator;
+    uint16_t command_len;
+    uint16_t args_len;
+    uint16_t l = str_len(arg);
+    args[0] = CH_NULL;
 
     uint8_t shallow = 0;
 
     if (l > 2 && arg[0] == '.' && arg[1] == PATH_SEP) {
         shallow = 1;
-        str_cpyn(cmd, &arg[2], PATH_MAX);
+        command_start += 2;
     } else {
         if (l > 3 && arg[1] == ':' && arg[2] == PATH_SEP) {
             shallow = 1;
         }
-        str_cpyn(cmd, arg, PATH_MAX);
     }
 
-    unsigned char* p = cmd;
-    while (*p++ != CH_NULL) {
-        if (*p == CH_SPACE) {
-            *p++ = CH_NULL;
-            if (*p != CH_NULL) {
-                str_cpyn(args, p, PATH_MAX);
-            }
-            break;
-        }
+    separator = command_start;
+    while (*separator != CH_NULL && *separator != CH_SPACE)
+        separator++;
+
+    command_len = separator - command_start;
+    if (command_len == 0 || command_len >= PATH_MAX)
+        return ERR_PATH_TOO_LONG;
+    str_cpyn(cmd, command_start, command_len);
+    cmd[command_len] = CH_NULL;
+
+    if (*separator == CH_SPACE) {
+        separator++;
+        args_len = str_len(separator);
+        if (args_len >= PATH_MAX)
+            return ERR_PATH_TOO_LONG;
+        str_cpyn(args, separator, args_len);
+        args[args_len] = CH_NULL;
     }
 
     if (!shallow) {

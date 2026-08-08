@@ -18,3 +18,4 @@ assets/*.zt[spm]
 src/config.h
 build_number.txt
 src/version.h
+__pycache__
