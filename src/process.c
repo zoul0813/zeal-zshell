@@ -17,8 +17,6 @@
 #include "history.h"
 #include "batch.h"
 
-static zos_err_t retval;
-
 static zos_err_t copy_checked(unsigned char* dst, const unsigned char* src, uint16_t capacity)
 {
     uint16_t len = str_len(src);
@@ -173,11 +171,15 @@ zos_err_t run(const char* arg)
     }
 
     unsigned char* argv = args;
+    zos_err_t child_status = ERR_SUCCESS;
+    zos_err_t exec_err = exec(EXEC_PRESERVE_PROGRAM, cmd, &argv, &child_status);
+    zos_err_t keyboard_err = kb_mode_non_block_raw();
 
-    err = exec(EXEC_PRESERVE_PROGRAM, cmd, &argv, &retval);
-    err = kb_mode_non_block_raw();
-    if (retval)
-        return retval;
+    if (exec_err)
+        return exec_err;
+    if (keyboard_err)
+        return keyboard_err;
+    return child_status;
 
 do_return:
     return err;
