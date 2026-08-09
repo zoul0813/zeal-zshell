@@ -150,7 +150,7 @@ def generate_header(config, output_file):
         f.write("#endif\n\n")
 
         f.write("#ifndef CONFIG_AUTOEXEC_FILENAME\n")
-        f.write("#define CONFIG_AUTOEXEC_FILENAME \"b:/autoexec.zs\"\n")
+        f.write("#define CONFIG_AUTOEXEC_FILENAME \"B:/autoexec.zs\"\n")
         f.write("#endif\n")
         f.write("#define AUTOEXEC_FILENAME CONFIG_AUTOEXEC_FILENAME\n\n")
 
