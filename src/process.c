@@ -51,10 +51,10 @@ static zos_err_t find_with_extension(unsigned char* name, const char* extension,
         str_cpyn(path + name_len, extension, ext_len);
         path[name_len + ext_len] = CH_NULL;
         err = stat(path, &zos_stat);
-        if (!err && D_ISFILE(zos_stat.s_flags)) {
-            copy_checked(result_path, path, PATH_MAX);
-            return ERR_SUCCESS;
-        }
+        if (err)
+            return err;
+        if (D_ISFILE(zos_stat.s_flags))
+            return copy_checked(result_path, path, PATH_MAX);
         return ERR_NO_SUCH_ENTRY;
     }
 
@@ -68,10 +68,12 @@ static zos_err_t find_with_extension(unsigned char* name, const char* extension,
         str_cpyn(path + base_len + name_len, extension, ext_len);
         path[base_len + name_len + ext_len] = CH_NULL;
         err = stat(path, &zos_stat);
-        if (!err && D_ISFILE(zos_stat.s_flags)) {
-            copy_checked(result_path, path, PATH_MAX);
-            return ERR_SUCCESS;
-        }
+        if (err == ERR_NO_SUCH_ENTRY)
+            continue;
+        if (err)
+            return err;
+        if (D_ISFILE(zos_stat.s_flags))
+            return copy_checked(result_path, path, PATH_MAX);
     }
 
     return ERR_NO_SUCH_ENTRY;
@@ -94,6 +96,8 @@ zos_err_t find_exec(unsigned char* name, uint8_t shallow)
     if (!err) {
         return copy_checked(name, path, PATH_MAX);
     }
+    if (err != ERR_NO_SUCH_ENTRY)
+        return err;
 
     // Only try with extensions if not shallow and the original name doesn't have one
     if (!shallow && !has_extension) {
@@ -102,12 +106,16 @@ zos_err_t find_exec(unsigned char* name, uint8_t shallow)
         if (!err) {
             return copy_checked(name, path, PATH_MAX);
         }
+        if (err != ERR_NO_SUCH_ENTRY)
+            return err;
 
         // Try with .zs extension
         err = find_with_extension(name, ".zs", shallow, path);
         if (!err) {
             return copy_checked(name, path, PATH_MAX);
         }
+        if (err != ERR_NO_SUCH_ENTRY)
+            return err;
     }
 
     return ERR_NO_SUCH_ENTRY;
@@ -168,6 +176,8 @@ zos_err_t run(const char* arg)
     // Check if file is .zs and use batch_process() instead of exec()
     unsigned char* dot = str_chrr(cmd, '.');
     if (dot != NULL && str_cmp(dot, ".zs") == 0) {
+        if (args[0] != CH_NULL)
+            return return_status(ERR_INVALID_PARAMETER);
         err = batch_process(cmd, BATCH_QUIET);
         return return_status(err);
     }

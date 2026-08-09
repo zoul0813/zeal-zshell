@@ -19,7 +19,6 @@ typedef struct {
 
 void history_init(History *list);
 HistoryNode* alloc_node(History *list);
-void free_node(History *list, HistoryNode *node);
 int8_t history_add(History *list, char* str);
 
 #if HISTORY_ENABLED

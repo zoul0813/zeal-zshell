@@ -138,7 +138,7 @@ int main(int argc, char **argv) {
 
 #if AUTOEXEC_ENABLED
     err = stat(AUTOEXEC_FILENAME, &zos_stat);
-    if(!err) {
+    if(!err && D_ISFILE(zos_stat.s_flags)) {
         batch_process(AUTOEXEC_FILENAME, BATCH_QUIET);
     } else {
         put_s("Could not load ");

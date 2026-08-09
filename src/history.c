@@ -25,13 +25,6 @@ HistoryNode* alloc_node(History *list) {
     return NULL;
 }
 
-void free_node(History *list, HistoryNode *node) {
-    uint8_t i = (uint8_t)(node - list->nodes);
-    if(i < HISTORY_MAX) {
-        list->used[i] = 0;
-    }
-}
-
 void history_init(History *list) {
     for(uint8_t i = 0; i < HISTORY_MAX; i++) {
         list->used[i] = 0;

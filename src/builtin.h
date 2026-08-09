@@ -34,4 +34,4 @@ zos_err_t cmd_false(char* args);
 zos_err_t cmd_ver(char* args);
 zos_err_t cmd_reset(char* args);
 
-#endif
+#endif /* BUILTIN_H */
