@@ -111,6 +111,11 @@ def generate_header(config, output_file):
         f.write("#endif\n")
         f.write("#define MAX_PATHS CONFIG_MAX_PATHS\n\n")
 
+        f.write("#ifndef CONFIG_BATCH_MAX_DEPTH\n")
+        f.write("#define CONFIG_BATCH_MAX_DEPTH 4\n")
+        f.write("#endif\n")
+        f.write("#define BATCH_MAX_DEPTH CONFIG_BATCH_MAX_DEPTH\n\n")
+
         f.write("#ifndef CONFIG_HISTORY_MAX_ENTRIES\n")
         f.write("#define CONFIG_HISTORY_MAX_ENTRIES 10\n")
         f.write("#endif\n")

@@ -13,13 +13,18 @@
 #include "process.h"
 
 
-// put a 1K buffer at the top of page 2
-char __at(0xBC00) aligned_buffer[1024];
+#define BATCH_READ_BUFFER_SIZE 128
+
 static char line[COMMAND_MAX];
+static uint8_t batch_depth = 0;
 
 zos_err_t batch_process(const char* path, batch_options_e options) {
     (void*)path;
     (void*)options;
+
+    if(batch_depth >= BATCH_MAX_DEPTH) {
+        return ERR_NO_MORE_MEMORY;
+    }
 
     zos_dev_t f = open(path, O_RDONLY);
     if(f < 0) {
@@ -31,8 +36,8 @@ zos_err_t batch_process(const char* path, batch_options_e options) {
         return -f;
     }
 
-    char *buffer = aligned_buffer;
-    char local[sizeof(aligned_buffer)];
+    batch_depth++;
+    char buffer[BATCH_READ_BUFFER_SIZE];
 
     // TODO: add option to "set quiet=1" for options |= BATCH_QUIET
 
@@ -43,10 +48,11 @@ zos_err_t batch_process(const char* path, batch_options_e options) {
     uint32_t total_read = 0;
 
     while(1) {
-        uint16_t size = sizeof(aligned_buffer);
+        uint16_t size = sizeof(buffer);
         zos_err_t read_err = read(f, buffer, &size);
         if(read_err) {
             close(f);
+            batch_depth--;
             put_s("ERROR[");
             put_hex(read_err);
             put_s("]: could not read ");
@@ -59,14 +65,8 @@ zos_err_t batch_process(const char* path, batch_options_e options) {
         }
         total_read += size;
 
-        // Copy to local buffer, so batch_process can be called multiple times
-        // (ie; autoexec.zs execs h:/test.zs)
-        // TODO: limits apply, we'll run out of stack space if we allow too much nesting
-        mem_cpy(local, buffer, size);
-
-        uint8_t *p = (uint8_t *)&local[0];
         for(uint16_t i = 0; i < size; i++) {
-            char c = p[i];
+            char c = buffer[i];
             if(c != CH_NEWLINE) {
                 if(!overflow && pos < (COMMAND_MAX - 1)) {
                     line[pos++] = c;
@@ -97,6 +97,7 @@ zos_err_t batch_process(const char* path, batch_options_e options) {
                         }
                         if(err) {
                             close(f);
+                            batch_depth--;
                             return err;
                         }
                     }
@@ -125,6 +126,7 @@ zos_err_t batch_process(const char* path, batch_options_e options) {
         put_u16(0);
         put_s(" bytes read\n");
         close(f);
+        batch_depth--;
         return ERR_SUCCESS;
     }
 
@@ -148,6 +150,7 @@ zos_err_t batch_process(const char* path, batch_options_e options) {
                     }
                     if(err) {
                         close(f);
+                        batch_depth--;
                         return err;
                     }
                 }
@@ -168,5 +171,6 @@ zos_err_t batch_process(const char* path, batch_options_e options) {
     }
 
     close(f);
+    batch_depth--;
     return err;
 }

@@ -56,6 +56,13 @@ config MAX_PATHS
     help
       Maximum number of paths that can be stored in the shell.
 
+config BATCH_MAX_DEPTH
+    int "Maximum nested batch depth"
+    default 4
+    range 1 16
+    help
+      Maximum number of batch scripts that may be active at once.
+
 config HISTORY_MAX_ENTRIES
     int "Maximum history entries"
     depends on HISTORY_ENABLED

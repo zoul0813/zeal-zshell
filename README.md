@@ -127,3 +127,4 @@ You can turn on/off various features of ZShell, such as [autoexec](#autoexec), c
 
 You can also configure how much memory ZShell uses, and adjust the maximum number of PATH's, history entries, etc.
 
+Batch script nesting depth is configurable from 1 to 16, with a default of 4.
