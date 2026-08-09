@@ -39,6 +39,8 @@ static uint8_t cmd_cd(char* args)
 
     zos_err_t err = chdir(args);
     handle_error(err, "change dir", 0);
+    if (err)
+        return err;
     return path_set_cwd(&cwd);
 }
 
