@@ -27,8 +27,24 @@ static zos_err_t set_path(char* path, char* str, size_t len)
     return ERR_SUCCESS;
 }
 
+static void print_environment(void)
+{
+    put_s("PATH=");
+    for (uint8_t i = 0; i < path_count; i++) {
+        if (i > 0)
+            put_c(',');
+        put_s(paths[i]);
+    }
+    put_c(CH_NEWLINE);
+}
+
 zos_err_t cmd_set(char* args)
 {
+    if (args[0] == CH_NULL) {
+        print_environment();
+        return ERR_SUCCESS;
+    }
+
     char* equals = str_chr(args, '=');
     if (!equals) {
         if (str_cmp(args, "PATH") == 0) {

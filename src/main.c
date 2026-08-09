@@ -132,11 +132,14 @@ int main(int argc, char **argv) {
                     const char *command = history_next();
                     if(command) prompt_set_command(command);
                 } break;
+#endif
+
                 case KB_ESC: {
+#if HISTORY_ENABLED
                     history_reset_navigation();
+#endif
                     prompt_clear();
                 } break;
-#endif
 
                 case KB_KEY_ENTER: {
                     prompt_normalize();

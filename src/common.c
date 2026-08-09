@@ -8,6 +8,7 @@
 #include <keyboard.h>
 #include "config.h"
 #include "common.h"
+#include "feedback.h"
 
 dir_t cwd;
 char paths[MAX_PATHS][PATH_MAX];
@@ -60,6 +61,7 @@ void print_error(uint8_t code) {
     put_s("): ");
     put_s(ERROR_STRINGS[c]);
     put_c(CH_NEWLINE);
+    feedback_beep();
 }
 
 void handle_error(zos_err_t err, char *msg, uint8_t fatal) {

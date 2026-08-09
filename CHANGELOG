@@ -9,6 +9,8 @@
 - Added Delete-key support for removing the character under the cursor.
 - Added bounded history navigation that preserves the command being edited.
 - Added numbered chronological history output and `history clear` for clearing session history.
+- Added a dark-red prompt after failed commands and audible feedback for errors or invalid command-line edits.
+- Added environment display through `set` with no arguments.
 - Added command normalization that trims surrounding spaces and collapses repeated spaces before execution and history storage.
 - Added configurable ZScript nesting depth, from 1 to 16 levels.
 - Added menuconfig options for enabling or disabling individual optional built-in commands.

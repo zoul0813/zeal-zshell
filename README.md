@@ -29,7 +29,7 @@ You can either [build ZShell from source](#building-from-source), or use one of 
 | `history` | History | show numbered command history, or clear it with `history clear` |
 | `pwd` | Optional | print the working directory |
 | `reset` | Optional | soft reset the entire system |
-| `set` | Always | set [env vars](#environment-variables) |
+| `set` | Always | display or set [environment variables](#environment-variables) |
 | `true` | Optional | always returns true, used for batch scripts |
 | `ver` | Optional | show the current ZShell version |
 | `which` | Optional | show where a binary is located |
@@ -38,17 +38,26 @@ Optional commands can be enabled or disabled in menuconfig. The `history` comman
 
 ## Command-line editing
 
-- Left and Right move the cursor one character.
-- Home moves the cursor to the start of the command.
-- End moves the cursor to the end of the command.
-- Backspace removes the character before the cursor.
-- Delete removes the character under the cursor.
-- Escape clears the current command.
-- Up and Down navigate command history when history support is enabled. Navigation stops at the oldest entry and at the preserved command draft.
+| Key | Action |
+| --- | ------ |
+| Left | Move cursor one character left. |
+| Right | Move cursor one character right. |
+| Home | Move cursor to start of command. |
+| End | Move cursor to end of command. End does not exit ZShell; use `exit`. |
+| Backspace | Remove character before cursor. Beeps at start of command. |
+| Delete | Remove character under cursor. Beeps at end of command. |
+| Escape | Clear current command. |
+| Up | Recall progressively older commands. Stops at oldest entry. |
+| Down | Recall progressively newer commands. Stops after restoring original draft. |
+| Enter | Execute command. |
+
+Up and Down require command-history support. Editing recalled command detaches it from history navigation and treats edited text as new draft.
 
 Leading and trailing spaces are removed before execution, and repeated spaces are collapsed to one. History therefore stores the normalized command; for example, ` ls   -l ` is stored and executed as `ls -l`.
 
 The `history` command lists entries in chronological order with numbers. Use `history clear` to erase all history from the current session.
+
+The prompt is dark red when the previous command failed. ZShell also emits a short feedback beep for command errors, a full command buffer, Backspace at the start of a command, and Delete at the end of a command.
 
 ## ZScripts (batch processing)
 
@@ -117,6 +126,12 @@ your favorite game or application (ie; [Zeal Commander](https://github.com/zoul0
 ZShell has limited environment variable support, currently it only supports `PATH`.
 
 For example, you can  `set PATH=A:/,B:/,T:/bin/`.
+
+Run `set` without arguments to display all supported variables in assignment form:
+
+```text
+PATH=A:/,B:/,T:/bin/
+```
 
 When `set` is run with just the var name `set PATH` it will display the vars values.
 

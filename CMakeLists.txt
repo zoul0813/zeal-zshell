@@ -35,6 +35,7 @@ endif()
 set(ZSHELL_SOURCES
     "src/main.c"
     "src/prompt.c"
+    "src/feedback.c"
     "src/common.c"
     "src/paths.c"
     "src/batch.c"
@@ -90,7 +91,7 @@ target_include_directories(${target_name} PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/ge
 target_include_directories(${target_name} PRIVATE ${CMAKE_CURRENT_LIST_DIR}/src)
 
 # Link with .lib extension for SDCC
-target_link_libraries(${target_name} zvb_gfx core keyboard)
+target_link_libraries(${target_name} zvb_gfx zvb_sound core keyboard)
 
 target_compile_options(${target_name} PRIVATE
     $<$<COMPILE_LANGUAGE:C>:--nostdlib>

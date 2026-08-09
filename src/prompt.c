@@ -8,6 +8,7 @@
 #include "common.h"
 #include "paths.h"
 #include "prompt.h"
+#include "feedback.h"
 
 static char command_buffer[COMMAND_MAX];
 static uint16_t command_length = 0;
@@ -55,7 +56,11 @@ zos_err_t prompt_init(void) {
 }
 
 void prompt_show(void) {
-    setcolor(TEXT_COLOR_LIGHT_GRAY, TEXT_COLOR_BLACK);
+    uint8_t prompt_color = last_status == ERR_SUCCESS
+        ? TEXT_COLOR_LIGHT_GRAY
+        : TEXT_COLOR_DARK_RED;
+
+    setcolor(prompt_color, TEXT_COLOR_BLACK);
     put_c(CH_RETURN);
     put_s(cwd.drive);
     if(cwd.truncated) put_s("/...");
@@ -134,7 +139,10 @@ void prompt_backspace(void) {
     uint16_t i;
     uint16_t repaint_length;
 
-    if(cursor_pos == 0) return;
+    if(cursor_pos == 0) {
+        feedback_beep();
+        return;
+    }
     cursor_left(1);
     cursor_pos--;
     for(i = cursor_pos; i < command_length; i++) {
@@ -152,7 +160,10 @@ void prompt_delete(void) {
     uint16_t i;
     uint16_t repaint_length;
 
-    if(cursor_pos >= command_length) return;
+    if(cursor_pos >= command_length) {
+        feedback_beep();
+        return;
+    }
     for(i = cursor_pos; i < command_length; i++) {
         command_buffer[i] = command_buffer[i + 1];
     }
@@ -169,7 +180,10 @@ void prompt_insert(unsigned char c) {
     uint16_t repaint_length;
 
     if(c < 0x20 || c > 0x7D) return;
-    if(command_length >= COMMAND_MAX - 1) return;
+    if(command_length >= COMMAND_MAX - 1) {
+        feedback_beep();
+        return;
+    }
     for(i = command_length; i > cursor_pos; i--) {
         command_buffer[i] = command_buffer[i - 1];
     }
