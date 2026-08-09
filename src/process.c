@@ -157,8 +157,7 @@ zos_err_t run(const char* arg)
     }
 
     if (!shallow) {
-        err = builtin(cmd, args);
-        if (err != 0xFF)
+        if (builtin(cmd, args, &err) == BUILTIN_MATCHED)
             return return_status(err);
     }
 

@@ -5,7 +5,7 @@
 
 #include "common.h"
 
-uint8_t cmd_hash(char* args)
+zos_err_t cmd_hash(char* args)
 {
     (void)args;
     put_u8(last_status);

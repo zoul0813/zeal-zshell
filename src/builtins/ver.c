@@ -6,7 +6,7 @@
 #include "common.h"
 #include "version.h"
 
-uint8_t cmd_ver(char* args)
+zos_err_t cmd_ver(char* args)
 {
     (void)args;
     put_s(APP_NAME);

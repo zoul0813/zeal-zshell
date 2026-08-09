@@ -6,7 +6,7 @@
 #include "common.h"
 #include "paths.h"
 
-uint8_t cmd_cd(char* args)
+zos_err_t cmd_cd(char* args)
 {
     uint16_t len = str_len(args);
     if (len == 0 || (args[len - 1] != PATH_SEP && len >= PATH_MAX - 1)) {

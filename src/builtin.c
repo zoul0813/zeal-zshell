@@ -46,11 +46,13 @@ const builtin_t builtins[] = {
     {       "",        NULL}
 };
 
-uint8_t builtin(char* cmd, char* args)
+builtin_match_t builtin(char* cmd, char* args, zos_err_t* status)
 {
     for (uint8_t i = 0; builtins[i].handler != NULL; i++) {
-        if (str_cmp(cmd, builtins[i].name) == 0)
-            return builtins[i].handler(args);
+        if (str_cmp(cmd, builtins[i].name) == 0) {
+            *status = builtins[i].handler(args);
+            return BUILTIN_MATCHED;
+        }
     }
-    return 0xFF;
+    return BUILTIN_NOT_MATCHED;
 }

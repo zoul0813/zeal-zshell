@@ -9,7 +9,7 @@
 #include "paths.h"
 #include "process.h"
 
-uint8_t cmd_which(char* args)
+zos_err_t cmd_which(char* args)
 {
     uint8_t shallow = 0;
     char* search_name = args;

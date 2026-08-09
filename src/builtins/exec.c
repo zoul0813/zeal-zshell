@@ -4,7 +4,7 @@
 
 #include "process.h"
 
-uint8_t cmd_exec(char* args)
+zos_err_t cmd_exec(char* args)
 {
     put_s("exec '");
     put_s(args);

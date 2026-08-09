@@ -5,7 +5,7 @@
 
 #include "history.h"
 
-uint8_t cmd_history(char* args)
+zos_err_t cmd_history(char* args)
 {
     (void)args;
     HistoryNode* node = history.tail;

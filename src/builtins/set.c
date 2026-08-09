@@ -27,7 +27,7 @@ static zos_err_t set_path(char* path, char* str, size_t len)
     return ERR_SUCCESS;
 }
 
-uint8_t cmd_set(char* args)
+zos_err_t cmd_set(char* args)
 {
     char* equals = str_chr(args, '=');
     if (!equals) {

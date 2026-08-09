@@ -6,7 +6,7 @@
 
 #include "builtin.h"
 
-uint8_t cmd_help(char* args)
+zos_err_t cmd_help(char* args)
 {
     (void)args;
     for (uint8_t i = 0; builtins[i].handler != NULL; i++) {
