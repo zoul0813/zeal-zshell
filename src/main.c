@@ -57,29 +57,29 @@ void use_history(HistoryNode *node) {
 }
 
 void usage(void) {
-    put_s("usage: zshell [-options] [path]\n");
+    put_s("usage: zshell [-options] path\n");
     put_s("   q - quiet mode\n");
 }
 
-batch_options_e parse_args(char **argv, char *path) {
+zos_err_t parse_args(char **argv, char *path, batch_options_e *options) {
     char* params = argv[0];
-    batch_options_e options = BATCH_NONE;
+    uint16_t path_len;
+
+    path[0] = CH_NULL;
+    *options = BATCH_NONE;
 
     if(*params == '-') {
         params++;
-        while(params) {
+        while(*params != CH_NULL && *params != CH_SPACE) {
             switch(*params) {
                 case 'q': {
-                    options |= BATCH_QUIET;
+                    *options |= BATCH_QUIET;
                 } break;
                 case 'h': {
                     usage();
                     exit(ERR_SUCCESS);
-                    return options;
+                    return ERR_SUCCESS;
                 } break;
-                case CH_NULL:
-                case CH_SPACE:
-                    goto parsed;
                 default: {
                     put_s("Invalid option: ");
                     put_s(params);
@@ -91,12 +91,22 @@ batch_options_e parse_args(char **argv, char *path) {
             params++;
         }
     }
-parsed:
+
     while(*params == CH_SPACE) params++;
-    if(*params != 0) {
-        str_cpy(path, params);
+    if(*params == CH_NULL) {
+        usage();
+        return ERR_INVALID_PARAMETER;
     }
-    return options;
+
+    path_len = str_len(params);
+    if(path_len >= PATH_MAX) {
+        put_s("Path too long\n");
+        return ERR_PATH_TOO_LONG;
+    }
+
+    str_cpyn(path, params, path_len);
+    path[path_len] = CH_NULL;
+    return ERR_SUCCESS;
 }
 
 int main(int argc, char **argv) {
@@ -110,7 +120,10 @@ int main(int argc, char **argv) {
 
     if(argc == 1) {
         char path[PATH_MAX];
-        batch_options_e options = parse_args(argv, path);
+        batch_options_e options;
+        err = parse_args(argv, path, &options);
+        if(err)
+            return err;
         err = batch_process(path, options);
         return err;
     }
