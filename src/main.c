@@ -117,6 +117,7 @@ int main(int argc, char **argv) {
         paths[i][0] = CH_NULL;
     }
     str_cpy(paths[0], "A:/");
+    path_count = 1;
 
     if(argc == 1) {
         char path[PATH_MAX];

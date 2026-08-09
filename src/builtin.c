@@ -101,9 +101,7 @@ static uint8_t cmd_set(char* args)
     char* equals = str_chr(args, '=');
     if (!equals) {
         if (str_cmp(args, "PATH") == 0) {
-            for (uint8_t i = 0; i < MAX_PATHS; i++) {
-                if (paths[i][0] == CH_NULL)
-                    break;
+            for (uint8_t i = 0; i < path_count; i++) {
                 put_u8(i);
                 put_c(CH_SPACE);
                 put_s(paths[i]);
@@ -167,6 +165,7 @@ static uint8_t cmd_set(char* args)
         start = p + 1;
     }
 
+    path_count = count;
     return ERR_SUCCESS;
 }
 

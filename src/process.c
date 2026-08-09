@@ -59,10 +59,7 @@ static zos_err_t find_with_extension(unsigned char* name, const char* extension,
     }
 
     // Try in all paths
-    for (uint8_t i = 0; i < MAX_PATHS; i++) {
-        if (paths[i][0] == CH_NULL)
-            break;
-
+    for (uint8_t i = 0; i < path_count; i++) {
         uint16_t base_len = str_len(paths[i]);
         if (base_len + name_len + ext_len >= PATH_MAX)
             continue;
