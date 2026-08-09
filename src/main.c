@@ -20,11 +20,6 @@ static zos_err_t err;
 static zos_stat_t zos_stat;
 #endif
 
-void use_history(HistoryNode *node) {
-    if(!node) return;
-    prompt_set_command(node->str);
-}
-
 void usage(void) {
     put_s("usage: zshell [-options] path\n");
     put_s("   q - quiet mode\n");
@@ -112,8 +107,7 @@ int main(int argc, char **argv) {
 #endif
 
 #if HISTORY_ENABLED
-    history_init(&history);
-    history_node = NULL;
+    history_init();
 #endif
 
     err = kb_mode_non_block_raw();
@@ -135,26 +129,15 @@ int main(int argc, char **argv) {
 #if HISTORY_ENABLED
                 // History navigation
                 case KB_UP_ARROW: {
-                    if(!history_node) {
-                        history_node = history.tail;
-                    } else {
-                        history_node = history_node->prev;
-                        if(!history_node) history_node = history.tail;
-                    }
-                    use_history(history_node);
-
+                    const char *command = history_previous();
+                    if(command) prompt_set_command(command);
                 } break;
                 case KB_DOWN_ARROW: {
-                    if(!history_node) {
-                        history_node = history.head;
-                    } else {
-                        history_node = history_node->next;
-                        if(!history_node) history_node = history.head;
-                    }
-                    use_history(history_node);
+                    const char *command = history_next();
+                    if(command) prompt_set_command(command);
                 } break;
                 case KB_ESC: {
-                    history_node = NULL;
+                    history_reset_navigation();
                     prompt_clear();
                 } break;
 #endif
@@ -163,8 +146,7 @@ int main(int argc, char **argv) {
                     put_c(CH_NEWLINE);
                     if(prompt_length() < 1) goto end_outer_loop;
 #if HISTORY_ENABLED
-                    history_add(&history, prompt_command());
-                    history_node = history.tail;
+                    history_add(prompt_command());
 #endif
 
                     err = run(prompt_command());

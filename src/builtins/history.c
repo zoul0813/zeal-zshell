@@ -8,12 +8,6 @@
 zos_err_t cmd_history(char* args)
 {
     (void)args;
-    HistoryNode* node = history.tail;
-    while (node) {
-        put_s("  ");
-        put_s(node->str);
-        put_c('\n');
-        node = node->prev;
-    }
+    history_print();
     return ERR_SUCCESS;
 }

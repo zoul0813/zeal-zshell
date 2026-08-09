@@ -2,28 +2,12 @@
 #define HISTORY_H
 
 #include <stdint.h>
-#include "config.h"
 
-typedef struct HistoryNode {
-    char str[COMMAND_MAX];
-    struct HistoryNode *prev;
-    struct HistoryNode *next;
-} HistoryNode;
-
-typedef struct {
-    HistoryNode nodes[HISTORY_MAX];
-    uint8_t used[HISTORY_MAX];
-    HistoryNode *head;
-    HistoryNode *tail;
-} History;
-
-void history_init(History *list);
-HistoryNode* alloc_node(History *list);
-int8_t history_add(History *list, char* str);
-
-#if HISTORY_ENABLED
-extern History history;
-extern HistoryNode* history_node;
-#endif
+void history_init(void);
+int8_t history_add(const char *str);
+const char *history_previous(void);
+const char *history_next(void);
+void history_reset_navigation(void);
+void history_print(void);
 
 #endif

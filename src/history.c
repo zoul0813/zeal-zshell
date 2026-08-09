@@ -8,10 +8,23 @@
 #include "common.h"
 #include "history.h"
 
-History history;
-HistoryNode *history_node;
+typedef struct HistoryNode {
+    char str[COMMAND_MAX];
+    struct HistoryNode *prev;
+    struct HistoryNode *next;
+} HistoryNode;
 
-HistoryNode* alloc_node(History *list) {
+typedef struct {
+    HistoryNode nodes[HISTORY_MAX];
+    uint8_t used[HISTORY_MAX];
+    HistoryNode *head;
+    HistoryNode *tail;
+} History;
+
+static History history;
+static HistoryNode *history_node;
+
+static HistoryNode* alloc_node(History *list) {
     for(uint8_t i = 0; i < HISTORY_MAX; i++) {
         if(!list->used[i]) {
             list->used[i] = 1;
@@ -25,15 +38,16 @@ HistoryNode* alloc_node(History *list) {
     return NULL;
 }
 
-void history_init(History *list) {
+void history_init(void) {
     for(uint8_t i = 0; i < HISTORY_MAX; i++) {
-        list->used[i] = 0;
+        history.used[i] = 0;
     }
-    list->head = NULL;
-    list->tail = NULL;
+    history.head = NULL;
+    history.tail = NULL;
+    history_node = NULL;
 }
 
-void history_remove(History *list, HistoryNode *node) {
+static void history_remove(History *list, HistoryNode *node) {
     if(node->prev) {
         node->prev->next = node->next;
     } else {
@@ -50,7 +64,7 @@ void history_remove(History *list, HistoryNode *node) {
     node->prev = NULL;
 }
 
-void history_push(History *list, HistoryNode *node) {
+static void history_push(History *list, HistoryNode *node) {
     node->next = NULL;
     node->prev = list->tail;
     if(list->tail) {
@@ -61,7 +75,7 @@ void history_push(History *list, HistoryNode *node) {
     list->tail = node;
 }
 
-HistoryNode* history_find(History *list, char* str) {
+static HistoryNode* history_find(History *list, const char* str) {
     HistoryNode *node = list->head;
     while(node) {
         if(str_cmp(node->str, str) == 0) {
@@ -72,7 +86,9 @@ HistoryNode* history_find(History *list, char* str) {
     return NULL;
 }
 
-int8_t history_add(History *list, char* str) {
+int8_t history_add(const char* str) {
+    History *list = &history;
+
     if(!str || str[0] == CH_NULL) {
         return 0; /// no command
     }
@@ -81,6 +97,7 @@ int8_t history_add(History *list, char* str) {
     if(existing) {
         history_remove(list, existing);
         history_push(list, existing);
+        history_reset_navigation();
         return 0;
     }
 
@@ -99,5 +116,41 @@ int8_t history_add(History *list, char* str) {
     str_cpyn(node->str, str, COMMAND_MAX - 1);
     node->str[COMMAND_MAX-1] = CH_NULL;
     history_push(list, node);
+    history_reset_navigation();
     return 0;
+}
+
+const char *history_previous(void) {
+    if(!history_node) {
+        history_node = history.tail;
+    } else {
+        history_node = history_node->prev;
+        if(!history_node) history_node = history.tail;
+    }
+    return history_node ? history_node->str : NULL;
+}
+
+const char *history_next(void) {
+    if(!history_node) {
+        history_node = history.head;
+    } else {
+        history_node = history_node->next;
+        if(!history_node) history_node = history.head;
+    }
+    return history_node ? history_node->str : NULL;
+}
+
+void history_reset_navigation(void) {
+    history_node = NULL;
+}
+
+void history_print(void) {
+    HistoryNode *node = history.tail;
+
+    while(node) {
+        put_s("  ");
+        put_s(node->str);
+        put_c(CH_NEWLINE);
+        node = node->prev;
+    }
 }
