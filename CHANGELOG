@@ -7,6 +7,9 @@
 - Added left and right cursor navigation while editing commands.
 - Added Home and End navigation for moving to the start or end of the command.
 - Added Delete-key support for removing the character under the cursor.
+- Added bounded history navigation that preserves the command being edited.
+- Added numbered chronological history output and `history clear` for clearing session history.
+- Added command normalization that trims surrounding spaces and collapses repeated spaces before execution and history storage.
 - Added configurable ZScript nesting depth, from 1 to 16 levels.
 - Added menuconfig options for enabling or disabling individual optional built-in commands.
 - Added an opt-in development build number while keeping normal release builds reproducible.
@@ -14,6 +17,8 @@
 ### Changed
 
 - Reworked command-line editing so insertion, deletion, clearing, and history recall work correctly across wrapped screen lines.
+- Editing a recalled history entry now detaches it from history navigation.
+- ZScript lines now use the same whitespace normalization as interactive commands.
 - Reworked ZScript processing to support nested scripts without corrupting the parent script and without consuming a large stack buffer for every nesting level.
 - Improved executable lookup so malformed paths and I/O errors are reported instead of being treated as missing files.
 - Validated PATH updates before replacing the active search path.

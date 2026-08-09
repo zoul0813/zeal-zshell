@@ -9,6 +9,7 @@ void prompt_show(void);
 void prompt_clear(void);
 void prompt_set_command(const char *command);
 void prompt_reset(void);
+void prompt_normalize(void);
 char *prompt_command(void);
 uint16_t prompt_length(void);
 void prompt_move_left(void);

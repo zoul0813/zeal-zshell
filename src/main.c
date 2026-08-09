@@ -125,7 +125,7 @@ int main(int argc, char **argv) {
 #if HISTORY_ENABLED
                 // History navigation
                 case KB_UP_ARROW: {
-                    const char *command = history_previous();
+                    const char *command = history_previous(prompt_command());
                     if(command) prompt_set_command(command);
                 } break;
                 case KB_DOWN_ARROW: {
@@ -139,6 +139,7 @@ int main(int argc, char **argv) {
 #endif
 
                 case KB_KEY_ENTER: {
+                    prompt_normalize();
                     put_c(CH_NEWLINE);
                     if(prompt_length() < 1) goto end_outer_loop;
 #if HISTORY_ENABLED
@@ -163,13 +164,22 @@ int main(int argc, char **argv) {
                     prompt_move_end();
                 } break;
                 case KB_KEY_BACKSPACE: {
+#if HISTORY_ENABLED
+                    history_reset_navigation();
+#endif
                     prompt_backspace();
                 } break;
                 case KB_DELETE: {
+#if HISTORY_ENABLED
+                    history_reset_navigation();
+#endif
                     prompt_delete();
                 } break;
                 default: {
                     unsigned char c = getch(key);
+#if HISTORY_ENABLED
+                    if(c >= 0x20 && c <= 0x7D) history_reset_navigation();
+#endif
                     prompt_insert(c);
                 } break;
             }

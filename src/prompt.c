@@ -94,6 +94,12 @@ void prompt_reset(void) {
     cursor_pos = 0;
 }
 
+void prompt_normalize(void) {
+    normalize_spaces(command_buffer);
+    command_length = str_len(command_buffer);
+    cursor_pos = command_length;
+}
+
 char *prompt_command(void) {
     return command_buffer;
 }

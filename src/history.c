@@ -23,6 +23,8 @@ typedef struct {
 
 static History history;
 static HistoryNode *history_node;
+static char history_draft[COMMAND_MAX];
+static uint8_t history_navigating;
 
 static HistoryNode* alloc_node(History *list) {
     for(uint8_t i = 0; i < HISTORY_MAX; i++) {
@@ -39,12 +41,18 @@ static HistoryNode* alloc_node(History *list) {
 }
 
 void history_init(void) {
+    history_clear();
+}
+
+void history_clear(void) {
     for(uint8_t i = 0; i < HISTORY_MAX; i++) {
         history.used[i] = 0;
     }
     history.head = NULL;
     history.tail = NULL;
     history_node = NULL;
+    history_draft[0] = CH_NULL;
+    history_navigating = 0;
 }
 
 static void history_remove(History *list, HistoryNode *node) {
@@ -120,37 +128,52 @@ int8_t history_add(const char* str) {
     return 0;
 }
 
-const char *history_previous(void) {
-    if(!history_node) {
+static void history_start_navigation(const char *current) {
+    str_cpyn(history_draft, current, COMMAND_MAX - 1);
+    history_draft[COMMAND_MAX - 1] = CH_NULL;
+    history_navigating = 1;
+}
+
+const char *history_previous(const char *current) {
+    if(!history.tail) return NULL;
+
+    if(!history_navigating) {
+        history_start_navigation(current);
         history_node = history.tail;
-    } else {
+    } else if(!history_node) {
+        history_node = history.tail;
+    } else if(history_node->prev) {
         history_node = history_node->prev;
-        if(!history_node) history_node = history.tail;
     }
-    return history_node ? history_node->str : NULL;
+    return history_node->str;
 }
 
 const char *history_next(void) {
-    if(!history_node) {
-        history_node = history.head;
-    } else {
+    if(!history_navigating) return NULL;
+
+    if(history_node && history_node->next) {
         history_node = history_node->next;
-        if(!history_node) history_node = history.head;
+        return history_node->str;
     }
-    return history_node ? history_node->str : NULL;
+
+    history_node = NULL;
+    return history_draft;
 }
 
 void history_reset_navigation(void) {
     history_node = NULL;
+    history_navigating = 0;
 }
 
 void history_print(void) {
-    HistoryNode *node = history.tail;
+    HistoryNode *node = history.head;
+    uint8_t number = 1;
 
     while(node) {
+        put_u8(number++);
         put_s("  ");
         put_s(node->str);
         put_c(CH_NEWLINE);
-        node = node->prev;
+        node = node->next;
     }
 }

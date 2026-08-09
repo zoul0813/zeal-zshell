@@ -26,7 +26,7 @@ You can either [build ZShell from source](#building-from-source), or use one of 
 | `exit` | Optional | exit ZShell (when current shell, just restarts ZShell - __does not__ reset system) |
 | `false` | Optional | always returns false, used for batch scripts |
 | `help` | Always | list the built-in commands compiled into ZShell |
-| `history` | History | show the command history |
+| `history` | History | show numbered command history, or clear it with `history clear` |
 | `pwd` | Optional | print the working directory |
 | `reset` | Optional | soft reset the entire system |
 | `set` | Always | set [env vars](#environment-variables) |
@@ -44,7 +44,11 @@ Optional commands can be enabled or disabled in menuconfig. The `history` comman
 - Backspace removes the character before the cursor.
 - Delete removes the character under the cursor.
 - Escape clears the current command.
-- Up and Down navigate command history when history support is enabled.
+- Up and Down navigate command history when history support is enabled. Navigation stops at the oldest entry and at the preserved command draft.
+
+Leading and trailing spaces are removed before execution, and repeated spaces are collapsed to one. History therefore stores the normalized command; for example, ` ls   -l ` is stored and executed as `ls -l`.
+
+The `history` command lists entries in chronological order with numbers. Use `history clear` to erase all history from the current session.
 
 ## ZScripts (batch processing)
 

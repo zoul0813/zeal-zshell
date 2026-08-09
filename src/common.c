@@ -74,6 +74,25 @@ void handle_error(zos_err_t err, char *msg, uint8_t fatal) {
   }
 }
 
+void normalize_spaces(char* str) {
+    char* read = str;
+    char* write = str;
+
+    while(*read == CH_SPACE) read++;
+
+    while(*read != CH_NULL) {
+        if(*read == CH_SPACE) {
+            while(*read == CH_SPACE) read++;
+            if(*read == CH_NULL) break;
+            *write++ = CH_SPACE;
+        } else {
+            *write++ = *read++;
+        }
+    }
+
+    *write = CH_NULL;
+}
+
 #if CONFIG_COLOR_SUPPORT
 void setcolor(uint8_t fg, uint8_t bg) {
     ioctl(DEV_STDOUT, CMD_SET_COLORS, TEXT_COLOR(fg, bg));

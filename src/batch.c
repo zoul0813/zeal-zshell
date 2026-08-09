@@ -26,6 +26,7 @@ typedef struct {
 
 static uint8_t process_line(batch_context_t* context, char* line)
 {
+    normalize_spaces(line);
     if (line[0] == CH_NULL || line[0] == BATCH_COMMENT)
         return 0;
 

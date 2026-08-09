@@ -20,6 +20,7 @@ int fflush_stdout(void); // defined in ZOS
 int __exit(zos_err_t err);
 void print_error(uint8_t code);
 void handle_error(zos_err_t err, char* msg, uint8_t fatal);
+void normalize_spaces(char* str);
 
 #if CONFIG_COLOR_SUPPORT
 void setcolor(uint8_t fg, uint8_t bg);
