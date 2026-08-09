@@ -18,6 +18,51 @@
 static char lines[BATCH_MAX_DEPTH][COMMAND_MAX];
 static uint8_t batch_depth = 0;
 
+typedef struct {
+    batch_options_e options;
+    uint8_t conditional;
+    zos_err_t status;
+} batch_context_t;
+
+static uint8_t process_line(batch_context_t* context, char* line)
+{
+    if (line[0] == CH_NULL || line[0] == BATCH_COMMENT)
+        return 0;
+
+    char* cmd = line;
+    uint8_t do_run = 1;
+
+    if (cmd[0] == TERNARY_TRUE || cmd[0] == TERNARY_FALSE) {
+        if (cmd[0] == TERNARY_TRUE && context->status)
+            do_run = 0;
+        if (cmd[0] == TERNARY_FALSE && !context->status)
+            do_run = 0;
+        cmd++;
+        while (*cmd == CH_SPACE)
+            cmd++;
+        context->conditional = 1;
+    } else {
+        if (context->conditional) {
+            context->conditional = 0;
+            context->status = ERR_SUCCESS;
+        }
+        if (context->status)
+            return 1;
+    }
+
+    if (!(context->options & BATCH_QUIET)) {
+        setcolor(TEXT_COLOR_LIGHT_GRAY, TEXT_COLOR_BLACK);
+        put_s("> ");
+        put_s(line);
+        put_c(CH_NEWLINE);
+        setcolor(TEXT_COLOR_WHITE, TEXT_COLOR_BLACK);
+    }
+
+    if (do_run)
+        context->status = run(cmd);
+    return 0;
+}
+
 static zos_err_t line_too_long(zos_dev_t f) {
     put_s("<line length>\n");
     close(f);
@@ -52,9 +97,11 @@ zos_err_t batch_process(const char* path, batch_options_e options) {
 
     uint16_t pos = 0;
     uint8_t overflow = 0;
-    uint8_t cond_block = 0;  // keep track of whether we're in a conditional block
-    zos_err_t err = ERR_SUCCESS;
-    uint32_t total_read = 0;
+    batch_context_t context = {
+        .options = options,
+        .conditional = 0,
+        .status = ERR_SUCCESS,
+    };
 
     while(1) {
         uint16_t size = sizeof(buffer);
@@ -72,8 +119,6 @@ zos_err_t batch_process(const char* path, batch_options_e options) {
         if(size < 1) {
             break;
         }
-        total_read += size;
-
         for(uint16_t i = 0; i < size; i++) {
             char c = buffer[i];
             if(c != CH_NEWLINE) {
@@ -88,54 +133,15 @@ zos_err_t batch_process(const char* path, batch_options_e options) {
                 if(overflow)
                     return line_too_long(f);
                 line[pos] = CH_NULL;
-                if(!overflow && str_len(line) > 0) {
-                    if(line[0] == BATCH_COMMENT) goto next_line;
-
-                    char *cmd = line;
-                    uint8_t do_run = 1;
-
-                    if(cmd[0] == TERNARY_TRUE || cmd[0] == TERNARY_FALSE) {
-                        if(cmd[0] == TERNARY_TRUE && err) do_run = 0;
-                        if(cmd[0] == TERNARY_FALSE && !err) do_run = 0;
-                        cmd++;
-                        while(*cmd == CH_SPACE) cmd++; // skip spaces
-                        cond_block = 1;
-                    } else {
-                        // Not a conditional - reset error if we were in a conditional block
-                        if(cond_block) {
-                            cond_block = 0;
-                            err = ERR_SUCCESS;
-                        }
-                        if(err) {
-                            close(f);
-                            batch_depth--;
-                            return err;
-                        }
-                    }
-
-                    if(!(options && BATCH_QUIET)) {
-                        setcolor(TEXT_COLOR_LIGHT_GRAY, TEXT_COLOR_BLACK);
-                        put_s("> ");
-                        put_s(line);
-                        put_c(CH_NEWLINE);
-                        setcolor(TEXT_COLOR_WHITE, TEXT_COLOR_BLACK);
-                    }
-
-                    if(do_run) {
-                        err = run(cmd);
-                    }
+                if (process_line(&context, line)) {
+                    close(f);
+                    batch_depth--;
+                    return context.status;
                 }
-                next_line:
                 pos = 0;
                 overflow = 0;
             }
         }
-    }
-
-    if(total_read < 1) {
-        close(f);
-        batch_depth--;
-        return ERR_SUCCESS;
     }
 
     if(overflow)
@@ -143,45 +149,14 @@ zos_err_t batch_process(const char* path, batch_options_e options) {
 
     if(pos > 0) {
         line[pos] = CH_NULL;
-        if(!overflow && str_len(line) > 0) {
-            if(line[0] != BATCH_COMMENT) {
-                char *cmd = line;
-                uint8_t do_run = 1;
-
-                if(cmd[0] == TERNARY_TRUE || cmd[0] == TERNARY_FALSE) {
-                    if(cmd[0] == TERNARY_TRUE && err) do_run = 0;
-                    if(cmd[0] == TERNARY_FALSE && !err) do_run = 0;
-                    cmd++;
-                    while(*cmd == CH_SPACE) cmd++; // skip spaces
-                    cond_block = 1;
-                } else {
-                    if(cond_block) {
-                        cond_block = 0;
-                        err = ERR_SUCCESS;
-                    }
-                    if(err) {
-                        close(f);
-                        batch_depth--;
-                        return err;
-                    }
-                }
-
-                if(!(options && BATCH_QUIET)) {
-                    setcolor(TEXT_COLOR_LIGHT_GRAY, TEXT_COLOR_BLACK);
-                    put_s("> ");
-                    put_s(line);
-                    put_c(CH_NEWLINE);
-                    setcolor(TEXT_COLOR_WHITE, TEXT_COLOR_BLACK);
-                }
-
-                if(do_run) {
-                    err = run(cmd);
-                }
-            }
+        if (process_line(&context, line)) {
+            close(f);
+            batch_depth--;
+            return context.status;
         }
     }
 
     close(f);
     batch_depth--;
-    return err;
+    return context.status;
 }
