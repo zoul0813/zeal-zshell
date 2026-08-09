@@ -23,15 +23,11 @@ execute_process(
 function(add_menuconfig_support TARGET_NAME)
     # Make sure the target depends on config.h
     add_dependencies(${TARGET_NAME} generate_config)
-
-    # Add include directory for config.h
-    target_include_directories(${TARGET_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/include)
 endfunction()
 
 # Generate config.h from .config
 add_custom_command(
     OUTPUT ${CONFIG_HEADER}
-    COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_SOURCE_DIR}/include
     COMMAND ${Python3_EXECUTABLE} ${GENERATE_CONFIG_SCRIPT} ${KCONFIG_CONFIG} ${CONFIG_HEADER}
     DEPENDS ${KCONFIG_CONFIG} ${GENERATE_CONFIG_SCRIPT}
     COMMENT "Generating config.h from .config"
@@ -55,7 +51,6 @@ add_custom_target(generate_config DEPENDS ${CONFIG_HEADER})
 # Menuconfig target (using Python menuconfig)
 if(MENUCONFIG_AVAILABLE EQUAL 0)
     add_custom_target(menuconfig
-        COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_SOURCE_DIR}/include
         COMMAND ${CMAKE_COMMAND} -E env 
             MENUCONFIG_STYLE=aquatic 
             KCONFIG_CONFIG=${KCONFIG_CONFIG}
@@ -75,7 +70,6 @@ endif()
 # Config target (text-based using Python)
 if(MENUCONFIG_AVAILABLE EQUAL 0)
     add_custom_target(config
-        COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_SOURCE_DIR}/include
         COMMAND ${CMAKE_COMMAND} -E env 
             KCONFIG_CONFIG=${KCONFIG_CONFIG}
             ${Python3_EXECUTABLE} -c "
@@ -103,7 +97,6 @@ endif()
 # Oldconfig target
 if(MENUCONFIG_AVAILABLE EQUAL 0)
     add_custom_target(oldconfig
-        COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_SOURCE_DIR}/include
         COMMAND ${Python3_EXECUTABLE} ${GENERATE_DEFCONFIG_SCRIPT}
             ${CMAKE_SOURCE_DIR}/Kconfig ${KCONFIG_CONFIG} --oldconfig
         COMMAND ${Python3_EXECUTABLE} ${GENERATE_CONFIG_SCRIPT} ${KCONFIG_CONFIG} ${CONFIG_HEADER}
@@ -120,7 +113,6 @@ endif()
 
 # Defconfig target
 add_custom_target(defconfig
-    COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_SOURCE_DIR}/include
     COMMAND ${CMAKE_COMMAND} -E echo "Creating default configuration..."
     COMMAND ${CMAKE_COMMAND} -E remove -f ${KCONFIG_CONFIG}
     COMMAND ${Python3_EXECUTABLE} ${GENERATE_DEFCONFIG_SCRIPT}
@@ -165,9 +157,8 @@ else()
         COMMAND ${CMAKE_COMMAND} -E echo "  help         - Show this help"
         COMMAND ${CMAKE_COMMAND} -E echo ""
         COMMAND ${CMAKE_COMMAND} -E echo "Usage:"
-        COMMAND ${CMAKE_COMMAND} -E echo "  cmake -B build"
-        COMMAND ${CMAKE_COMMAND} -E echo "  cmake --build build --target menuconfig"
-        COMMAND ${CMAKE_COMMAND} -E echo "  cmake --build build"
+        COMMAND ${CMAKE_COMMAND} -E echo "  Configure: zde cmake --target menuconfig"
+        COMMAND ${CMAKE_COMMAND} -E echo "  Build: zde cmake"
         COMMAND ${CMAKE_COMMAND} -E echo ""
     )
 endif()

@@ -86,7 +86,6 @@ add_executable(${target_name} ${ZSHELL_SOURCES})
 
 target_include_directories(${target_name} PRIVATE $ENV{ZVB_SDK_PATH}/include)
 target_include_directories(${target_name} PRIVATE ${CMAKE_CURRENT_LIST_DIR}/src)
-target_include_directories(${target_name} PRIVATE ${CMAKE_CURRENT_LIST_DIR}/include)
 
 # Link with .lib extension for SDCC
 target_link_libraries(${target_name} zvb_gfx core keyboard)

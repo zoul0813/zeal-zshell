@@ -123,7 +123,17 @@ zde cmake
 
 ZShell supports a simple menuconfig, similar to the Zeal 8-bit OS kernel config.
 
-Run `zde cmake`, then invoke the generated `menuconfig` build target.
+Run interactive configuration through ZDE:
+
+```shell
+zde cmake --target menuconfig
+```
+
+Then build with exact ZDE command:
+
+```shell
+zde cmake
+```
 
 You can turn on/off various features of ZShell, such as [autoexec](#autoexec), command history, and color support.
 

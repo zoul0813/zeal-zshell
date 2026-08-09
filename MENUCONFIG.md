@@ -2,54 +2,38 @@
 
 This project now includes a menuconfig system for easy configuration management, similar to what's used in the Linux kernel.
 
-## Setup
-
-1. Run the setup script to install dependencies:
-   ```bash
-   ./scripts/setup.sh
-   ```
-
-2. If you're on Ubuntu/Debian, you can install kconfig-frontends directly:
-   ```bash
-   sudo apt-get install kconfig-frontends
-   ```
-
 ## Usage
 
-### Setup CMake
-```bash
-cmake -B build
-```
-This configures the CMake build system.
-
 ### Interactive Configuration
+
 ```bash
-cmake --build build --target menuconfig
+zde cmake --target menuconfig
 ```
+
 This opens a graphical menu where you can configure all options interactively.
 
-### Text-based Configuration  
-```bash
-cmake --build build --target config
-```
-This provides a text-based question/answer configuration interface.
-
 ### Reset to Defaults
+
 ```bash
-cmake --build build --target defconfig
+zde cmake --target defconfig
 ```
+
 This resets all configuration options to their default values.
 
 ### Update Configuration
+
 ```bash
-cmake --build build --target oldconfig
+zde cmake --target oldconfig
 ```
+
 This updates your existing configuration with any new options that have been added.
 
 ### Build
+
 ```bash
-cmake --build build
+zde cmake
 ```
+
 This builds the shell with your current configuration.
 
 ## Configuration Options
@@ -83,16 +67,15 @@ The internal `cd`, `help`, and `set` commands are always built. `history` is con
 - `Kconfig`: Configuration definition file
 - `CMakeLists.txt`: CMake build configuration with menuconfig integration
 - `.config`: Generated configuration file (do not edit manually)
-- `include/config.h`: Generated C header with configuration defines
+- `src/config.h`: Generated C header with configuration defines
 - `scripts/generate_config.py`: Script to convert .config to config.h
-- `scripts/setup.sh`: Setup script for dependencies
 
 ## How It Works
 
 1. The `Kconfig` file defines all available configuration options
-2. Running `cmake --build build --target menuconfig` allows you to set these options interactively  
+2. Running `zde cmake --target menuconfig` allows you to set these options interactively
 3. Your choices are saved in `.config`
-4. The `generate_config.py` script converts `.config` to `include/config.h`
+4. The `generate_config.py` script converts `.config` to `src/config.h`
 5. CMake automatically regenerates `config.h` when `.config` changes
 6. Your C code includes `config.h` and uses the `CONFIG_*` defines
 
@@ -109,6 +92,6 @@ The system maintains backward compatibility by providing the old constant names:
 To add a new configuration option:
 
 1. Edit `Kconfig` and add your option
-2. Run `cmake --build build --target menuconfig` to configure it
+2. Run `zde cmake --target menuconfig` to configure it
 3. Use `#ifdef CONFIG_YOUR_OPTION` in your C code
 4. Optionally add backward compatibility defines in `generate_config.py`
