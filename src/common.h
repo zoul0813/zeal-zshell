@@ -12,6 +12,7 @@
 
 extern dir_t cwd;
 extern char paths[MAX_PATHS][PATH_MAX];
+extern zos_err_t last_status;
 
 int fflush_stdout(void); // defined in ZOS
 

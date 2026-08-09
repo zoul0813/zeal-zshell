@@ -16,13 +16,11 @@
 #include "builtin.h"
 #include "version.h"
 
-static zos_err_t retval;
-
 // Individual command functions
 static uint8_t cmd_hash(char* args)
 {
     (void*) args;
-    put_u8(retval);
+    put_u8(last_status);
     put_c(CH_NEWLINE);
     return ERR_SUCCESS;
 }

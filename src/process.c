@@ -28,6 +28,12 @@ static zos_err_t copy_checked(unsigned char* dst, const unsigned char* src, uint
     return ERR_SUCCESS;
 }
 
+static zos_err_t return_status(zos_err_t status)
+{
+    last_status = status;
+    return status;
+}
+
 static zos_err_t find_with_extension(unsigned char* name, const char* extension, uint8_t shallow,
                                      unsigned char* result_path)
 {
@@ -140,7 +146,7 @@ zos_err_t run(const char* arg)
 
     command_len = separator - command_start;
     if (command_len == 0 || command_len >= PATH_MAX)
-        return ERR_PATH_TOO_LONG;
+        return return_status(ERR_PATH_TOO_LONG);
     str_cpyn(cmd, command_start, command_len);
     cmd[command_len] = CH_NULL;
 
@@ -148,7 +154,7 @@ zos_err_t run(const char* arg)
         separator++;
         args_len = str_len(separator);
         if (args_len >= PATH_MAX)
-            return ERR_PATH_TOO_LONG;
+            return return_status(ERR_PATH_TOO_LONG);
         str_cpyn(args, separator, args_len);
         args[args_len] = CH_NULL;
     }
@@ -156,7 +162,7 @@ zos_err_t run(const char* arg)
     if (!shallow) {
         err = builtin(cmd, args);
         if (err != 0xFF)
-            return err;
+            return return_status(err);
     }
 
     err = find_exec(cmd, shallow);
@@ -167,7 +173,7 @@ zos_err_t run(const char* arg)
     unsigned char* dot = str_chrr(cmd, '.');
     if (dot != NULL && str_cmp(dot, ".zs") == 0) {
         err = batch_process(cmd, BATCH_QUIET);
-        return err;
+        return return_status(err);
     }
 
     unsigned char* argv = args;
@@ -176,11 +182,11 @@ zos_err_t run(const char* arg)
     zos_err_t keyboard_err = kb_mode_non_block_raw();
 
     if (exec_err)
-        return exec_err;
+        return return_status(exec_err);
     if (keyboard_err)
-        return keyboard_err;
-    return child_status;
+        return return_status(keyboard_err);
+    return return_status(child_status);
 
 do_return:
-    return err;
+    return return_status(err);
 }
