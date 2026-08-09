@@ -9,8 +9,6 @@
 #include "common.h"
 
 dir_t cwd;
-History history;
-HistoryNode *history_node;
 char paths[MAX_PATHS][PATH_MAX];
 uint8_t path_count = 0;
 zos_err_t last_status = ERR_SUCCESS;

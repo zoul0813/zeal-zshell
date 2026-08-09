@@ -20,7 +20,9 @@ static unsigned char buffer[COMMAND_MAX];
 static uint16_t pos = 0;
 static uint16_t size;
 static zos_err_t err;
+#if AUTOEXEC_ENABLED
 static zos_stat_t zos_stat;
+#endif
 
 void prompt(char *cmd) {
     setcolor(TEXT_COLOR_LIGHT_GRAY, TEXT_COLOR_BLACK);

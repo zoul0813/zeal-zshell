@@ -69,9 +69,12 @@ def validate_config(config):
         values[key] = value
 
     command_max = values["COMMAND_MAX"]
+    history_storage = 0
+    if config.get("HISTORY_ENABLED") is True:
+        history_storage = values["HISTORY_MAX_ENTRIES"] * (command_max + 5)
     configured_storage = (
         command_max
-        + values["HISTORY_MAX_ENTRIES"] * (command_max + 5)
+        + history_storage
         + values["MAX_PATHS"] * ZEAL_PATH_MAX
         + values["BATCH_MAX_DEPTH"] * command_max
     )

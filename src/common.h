@@ -27,10 +27,4 @@ void setcolor(uint8_t fg, uint8_t bg);
 #define setcolor(fg, bg)
 #endif
 
-#if HISTORY_ENABLED
-#include "history.h"
-extern History history;
-extern HistoryNode* history_node;
-#endif
-
 #endif

@@ -32,15 +32,32 @@ if(EXISTS ${CMAKE_CURRENT_LIST_DIR}/menuconfig.cmake)
     include(${CMAKE_CURRENT_LIST_DIR}/menuconfig.cmake)
 endif()
 
-add_executable(${target_name}
+set(ZSHELL_SOURCES
     "src/main.c"
     "src/common.c"
-    "src/history.c"
     "src/paths.c"
     "src/batch.c"
     "src/builtin.c"
     "src/process.c"
 )
+
+set(ZSHELL_HISTORY_ENABLED ON)
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
+    ${CMAKE_CURRENT_LIST_DIR}/.config
+)
+if(EXISTS ${CMAKE_CURRENT_LIST_DIR}/.config)
+    file(STRINGS ${CMAKE_CURRENT_LIST_DIR}/.config ZSHELL_HISTORY_CONFIG
+        REGEX "^CONFIG_HISTORY_ENABLED=y$"
+    )
+    if(NOT ZSHELL_HISTORY_CONFIG)
+        set(ZSHELL_HISTORY_ENABLED OFF)
+    endif()
+endif()
+if(ZSHELL_HISTORY_ENABLED)
+    list(APPEND ZSHELL_SOURCES "src/history.c")
+endif()
+
+add_executable(${target_name} ${ZSHELL_SOURCES})
 
 target_include_directories(${target_name} PRIVATE $ENV{ZVB_SDK_PATH}/include)
 target_include_directories(${target_name} PRIVATE ${CMAKE_CURRENT_LIST_DIR}/include)

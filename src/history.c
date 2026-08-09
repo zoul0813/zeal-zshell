@@ -8,6 +8,9 @@
 #include "common.h"
 #include "history.h"
 
+History history;
+HistoryNode *history_node;
+
 HistoryNode* alloc_node(History *list) {
     for(uint8_t i = 0; i < HISTORY_MAX; i++) {
         if(!list->used[i]) {

@@ -58,6 +58,7 @@ static uint8_t cmd_exit(char* args)
     return __exit(ERR_SUCCESS);
 }
 
+#if HISTORY_ENABLED
 static uint8_t cmd_history(char* args)
 {
     (void*) args;
@@ -70,6 +71,7 @@ static uint8_t cmd_history(char* args)
     }
     return ERR_SUCCESS;
 }
+#endif
 
 static uint8_t cmd_clear(char* args)
 {
@@ -257,7 +259,9 @@ const builtin_t builtins[] = {
     {   "exit",    cmd_exit},
     {   "help",    cmd_help},
     {   "exec",    cmd_exec},
+#if HISTORY_ENABLED
     {"history", cmd_history},
+#endif
     {  "clear",   cmd_clear},
     {    "set",     cmd_set},
     {  "which",   cmd_which},
