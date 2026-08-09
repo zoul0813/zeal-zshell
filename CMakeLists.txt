@@ -34,6 +34,7 @@ endif()
 
 set(ZSHELL_SOURCES
     "src/main.c"
+    "src/prompt.c"
     "src/common.c"
     "src/paths.c"
     "src/batch.c"

@@ -3,9 +3,7 @@
 #include <stddef.h>
 #include <zos_errors.h>
 #include <zos_sys.h>
-#include <zos_video.h>
 #include <zos_vfs.h>
-#include <zvb_hardware.h>
 #include <core.h>
 #include <keyboard.h>
 
@@ -15,50 +13,16 @@
 #include "paths.h"
 #include "batch.h"
 #include "process.h"
+#include "prompt.h"
 
-static unsigned char buffer[COMMAND_MAX];
-static uint16_t pos = 0;
 static zos_err_t err;
-static zos_text_area_t text_area;
 #if AUTOEXEC_ENABLED
 static zos_stat_t zos_stat;
 #endif
 
-void prompt(char *cmd) {
-    setcolor(TEXT_COLOR_LIGHT_GRAY, TEXT_COLOR_BLACK);
-    put_c(CH_RETURN);
-    put_s(cwd.drive);
-    if(cwd.truncated) put_s("/...");
-    put_s(cwd.folder);
-    put_c('>');
-    if(cmd != NULL) {
-        put_s(cmd);
-    }
-    fflush_stdout();
-    setcolor(TEXT_COLOR_WHITE, TEXT_COLOR_BLACK);
-}
-
-void clear_command(void) {
-    uint16_t clear_length = pos + 4u;
-
-    put_c(CH_RETURN);
-    for(uint16_t i = 0; i < clear_length; i++) {
-        put_c(CH_SPACE);
-    }
-    put_c(CH_RETURN);
-    buffer[0] = CH_NULL;
-    pos = 0;
-    fflush_stdout();
-}
-
 void use_history(HistoryNode *node) {
     if(!node) return;
-    clear_command();
-    prompt(node->str);
-    fflush_stdout();
-    str_cpyn(buffer, node->str, COMMAND_MAX - 1);
-    buffer[COMMAND_MAX - 1] = CH_NULL;
-    pos = str_len(buffer);
+    prompt_set_command(node->str);
 }
 
 void usage(void) {
@@ -154,11 +118,11 @@ int main(int argc, char **argv) {
 
     err = kb_mode_non_block_raw();
     handle_error(err, "init keyboard", 1);
-    err = ioctl(DEV_STDOUT, CMD_GET_AREA, &text_area);
+    err = prompt_init();
     handle_error(err, "get text area", 1);
 
     for(;;) {
-        prompt(NULL);
+        prompt_show();
         fflush_stdout();
         for(;;) {
             kb_keys_t key = getkey();
@@ -191,53 +155,38 @@ int main(int argc, char **argv) {
                 } break;
                 case KB_ESC: {
                     history_node = NULL;
-                    clear_command();
-                    prompt(NULL);
-                    fflush_stdout();
+                    prompt_clear();
                 } break;
 #endif
 
                 case KB_KEY_ENTER: {
                     put_c(CH_NEWLINE);
-                    if(pos < 1) goto end_outer_loop;
-                    buffer[pos] = CH_NULL;
+                    if(prompt_length() < 1) goto end_outer_loop;
 #if HISTORY_ENABLED
-                    history_add(&history, buffer);
+                    history_add(&history, prompt_command());
                     history_node = history.tail;
 #endif
 
-                    err = run(buffer);
+                    err = run(prompt_command());
                     if(err) print_error(err);
 
-                    buffer[0] = CH_NULL;
-                    pos = 0;
+                    prompt_reset();
                 } goto end_outer_loop;
+                case KB_LEFT_ARROW: {
+                    prompt_move_left();
+                } break;
+                case KB_RIGHT_ARROW: {
+                    prompt_move_right();
+                } break;
                 case KB_KEY_BACKSPACE: {
-                    if(pos == 0) break;
-                    pos--;
-                    buffer[pos] = CH_NULL;
-                    uint8_t x = zvb_peri_text_curs_x;
-                    uint8_t y = zvb_peri_text_curs_y;
-                    if(x == 0) {
-                        x = text_area.width - 1;
-                        if(y > 0) y--;
-                    } else {
-                        x--;
-                    }
-                    zvb_peri_text_curs_y     = y;
-                    zvb_peri_text_curs_x     = x;
-                    zvb_peri_text_print_char = CH_NULL;
-                    zvb_peri_text_curs_y     = y;
-                    zvb_peri_text_curs_x     = x;
+                    prompt_backspace();
+                } break;
+                case KB_DELETE: {
+                    prompt_delete();
                 } break;
                 default: {
                     unsigned char c = getch(key);
-                    if(c < 0x20 || c > 0x7D) break; // unprintable
-                    if(pos >= COMMAND_MAX - 1) break;
-                    buffer[pos++] = c;
-                    buffer[pos] = CH_NULL;
-                    put_c(c);
-                    fflush_stdout();
+                    prompt_insert(c);
                 } break;
             }
         }
