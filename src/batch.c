@@ -18,6 +18,13 @@
 static char lines[BATCH_MAX_DEPTH][COMMAND_MAX];
 static uint8_t batch_depth = 0;
 
+static zos_err_t line_too_long(zos_dev_t f) {
+    put_s("<line length>\n");
+    close(f);
+    batch_depth--;
+    return ERR_PATH_TOO_LONG;
+}
+
 zos_err_t batch_process(const char* path, batch_options_e options) {
     (void*)path;
     (void*)options;
@@ -78,6 +85,8 @@ zos_err_t batch_process(const char* path, batch_options_e options) {
             }
 
             if(c == CH_NEWLINE) {
+                if(overflow)
+                    return line_too_long(f);
                 line[pos] = CH_NULL;
                 if(!overflow && str_len(line) > 0) {
                     if(line[0] == BATCH_COMMENT) goto next_line;
@@ -131,6 +140,9 @@ zos_err_t batch_process(const char* path, batch_options_e options) {
         batch_depth--;
         return ERR_SUCCESS;
     }
+
+    if(overflow)
+        return line_too_long(f);
 
     if(pos > 0) {
         line[pos] = CH_NULL;
