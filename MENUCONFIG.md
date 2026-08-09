@@ -56,6 +56,10 @@ Combined command, history, PATH, and nested-batch storage is limited to 15,000 b
 - **AUTOEXEC_ENABLED**: Enable/disable autoexec processing (default: enabled)
 - **COLOR_SUPPORT**: Enable/disable ANSI color support (default: enabled)
 
+### Developer
+
+- **DEV_BUILD_NUMBER**: Increment and display a local development build number (default: disabled)
+
 ### Built-in Commands
 
 The `#`, `pwd`, `exit`, `exec`, `clear`, `which`, `true`, `false`, `ver`, and `reset` commands each have an enabled-by-default option. Disabled handlers are omitted from both the command list and the linked binary.

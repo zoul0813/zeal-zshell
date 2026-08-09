@@ -85,6 +85,7 @@ endforeach()
 add_executable(${target_name} ${ZSHELL_SOURCES})
 
 target_include_directories(${target_name} PRIVATE $ENV{ZVB_SDK_PATH}/include)
+target_include_directories(${target_name} PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/generated)
 target_include_directories(${target_name} PRIVATE ${CMAKE_CURRENT_LIST_DIR}/src)
 
 # Link with .lib extension for SDCC
@@ -126,20 +127,29 @@ add_custom_command(TARGET ${target_name}_bin POST_BUILD
     VERBATIM
 )
 
-# Create a custom target that increments build number on every build
-add_custom_target(increment_build_number
-    COMMAND ${CMAKE_COMMAND}
-        -DBUILD_NUMBER_FILE=${CMAKE_CURRENT_LIST_DIR}/build_number.txt
-        -DVERSION_TEMPLATE=${CMAKE_CURRENT_LIST_DIR}/src/version.h.in
-        -DVERSION_OUTPUT=${CMAKE_CURRENT_LIST_DIR}/src/version.h
-        -DAPP_VERSION_MAJOR=${APP_VERSION_MAJOR}
-        -DAPP_VERSION_MINOR=${APP_VERSION_MINOR}
-        -DAPP_VERSION_PATCH=${APP_VERSION_PATCH}
-        -DAPP_NAME=${APP_NAME}
-        -P ${CMAKE_CURRENT_LIST_DIR}/increment_version.cmake
-    BYPRODUCTS ${CMAKE_CURRENT_LIST_DIR}/src/version.h
-    COMMENT "Incrementing build number and generating version.h"
-)
+set(VERSION_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/generated)
+set(VERSION_OUTPUT ${VERSION_OUTPUT_DIR}/version.h)
+file(MAKE_DIRECTORY ${VERSION_OUTPUT_DIR})
 
-# Make zshell depend on the version increment
-add_dependencies(${target_name} increment_build_number)
+zshell_config_enabled(DEV_BUILD_NUMBER OFF ZSHELL_DEV_BUILD_NUMBER)
+if(ZSHELL_DEV_BUILD_NUMBER)
+    # Deliberately non-reproducible local development mode.
+    add_custom_target(increment_build_number
+        COMMAND ${CMAKE_COMMAND}
+            -DBUILD_NUMBER_FILE=${CMAKE_CURRENT_LIST_DIR}/build_number.txt
+            -DVERSION_TEMPLATE=${CMAKE_CURRENT_LIST_DIR}/src/version.h.in
+            -DVERSION_OUTPUT=${VERSION_OUTPUT}
+            -DAPP_VERSION_MAJOR=${APP_VERSION_MAJOR}
+            -DAPP_VERSION_MINOR=${APP_VERSION_MINOR}
+            -DAPP_VERSION_PATCH=${APP_VERSION_PATCH}
+            -DAPP_NAME=${APP_NAME}
+            -P ${CMAKE_CURRENT_LIST_DIR}/increment_version.cmake
+        BYPRODUCTS ${VERSION_OUTPUT}
+        COMMENT "Incrementing local development build number"
+    )
+    add_dependencies(${target_name} increment_build_number)
+else()
+    # Stable version header for reproducible release and CI builds.
+    set(BUILD_NUMBER 0)
+    configure_file(${CMAKE_CURRENT_LIST_DIR}/src/version.h.in ${VERSION_OUTPUT} @ONLY)
+endif()

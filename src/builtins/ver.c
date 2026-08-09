@@ -12,8 +12,10 @@ zos_err_t cmd_ver(char* args)
     put_s(APP_NAME);
     put_c(CH_SPACE);
     put_s(APP_VERSION_STRING);
+#if CONFIG_DEV_BUILD_NUMBER
     put_c('-');
-    put_u8(APP_VERSION_BUILD);
+    put_u16(APP_VERSION_BUILD);
+#endif
     put_c(CH_NEWLINE);
     return ERR_SUCCESS;
 }

@@ -107,3 +107,15 @@ config HISTORY_MAX_ENTRIES
       Maximum number of command history entries to keep.
 
 endmenu
+
+menu "Developer"
+
+config DEV_BUILD_NUMBER
+    bool "Enable local development build number"
+    default n
+    help
+      Increment and display a local build number. This intentionally makes
+      successive local build artifacts differ and should remain disabled for
+      reproducible release and CI builds.
+
+endmenu
