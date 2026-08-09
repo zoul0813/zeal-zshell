@@ -29,7 +29,11 @@ static uint8_t cmd_hash(char* args)
 
 static uint8_t cmd_cd(char* args)
 {
-    uint8_t l = str_len(args);
+    uint16_t l = str_len(args);
+    if (l == 0 || (args[l - 1] != PATH_SEP && l >= PATH_MAX - 1)) {
+        put_s("cd <path>\n");
+        return ERR_INVALID_PARAMETER;
+    }
     if (args[l - 1] != PATH_SEP) {
         args[l]     = PATH_SEP;
         args[l + 1] = CH_NULL;
