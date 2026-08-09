@@ -1,5 +1,67 @@
-        zshell change log
+# Changelog
 
-        1.0.0 - 2025-10-18
+## 0.2.0 - 2026-08-09
 
-        * Create new project
+### Added
+
+- Added left and right cursor navigation while editing commands.
+- Added Delete-key support for removing the character under the cursor.
+- Added configurable ZScript nesting depth, from 1 to 16 levels.
+- Added menuconfig options for enabling or disabling individual optional built-in commands.
+- Added an opt-in development build number while keeping normal release builds reproducible.
+
+### Changed
+
+- Reworked command-line editing so insertion, deletion, clearing, and history recall work correctly across wrapped screen lines.
+- Reworked ZScript processing to support nested scripts without corrupting the parent script and without consuming a large stack buffer for every nesting level.
+- Improved executable lookup so malformed paths and I/O errors are reported instead of being treated as missing files.
+- Validated PATH updates before replacing the active search path.
+- Made `.zs` arguments explicitly return an unsupported-parameter error instead of silently discarding them.
+- Only run the configured autoexec path when it exists and is a file.
+- Made optional history and built-in settings remove their corresponding code from the build as configured.
+
+### Fixed
+
+- Fixed command entry overflowing or corrupting memory at the maximum command length.
+- Fixed oversized commands and paths causing unterminated buffers or out-of-bounds access.
+- Fixed PATH assignments writing beyond the configured path array.
+- Fixed `cd` with no argument reading outside its buffer, and fixed failed directory changes returning success.
+- Fixed nested ZScripts corrupting their parent script's parser state.
+- Fixed large and unterminated ZScript lines being silently dropped as successful.
+- Fixed ZScript nesting exhausting stack memory.
+- Fixed program launch errors being discarded and stale child exit statuses being returned.
+- Fixed the `#` built-in reporting a status different from the process runner's status.
+- Fixed invalid or oversized startup script paths being accepted.
+- Fixed incompatible memory-related configuration values being allowed.
+- Fixed empty ZScripts displaying an unnecessary error.
+- Fixed command clearing and Backspace behavior at screen boundaries and on wrapped lines.
+
+## 0.1.1 - 2025-12-23
+
+### Added
+
+- Added the `exec` built-in for explicitly running ZScripts.
+- Added support for nested ZScript execution, including running another script from `autoexec.zs`.
+- Added streaming ZScript processing so scripts can be larger than 4 KiB.
+
+### Changed
+
+- Reduced the dedicated ZScript read buffer from 4 KiB to 1 KiB.
+- Moved the batch-processing buffer into the batch processor instead of reserving shared application memory.
+
+## 0.1.0 - 2025-11-29
+
+Initial release of ZShell for Zeal 8-bit OS.
+
+### Features
+
+- Interactive command prompt with command history and Escape-to-clear behavior.
+- PATH-based executable lookup, including automatic `.bin` and `.zs` extension lookup and explicit `./` execution from the current directory.
+- Configurable comma-separated `PATH` values through the `set` built-in.
+- Working-directory navigation with drive and directory display in the prompt.
+- ZScript batch processing with comments, quiet mode, direct script execution, and simple success (`?`) and failure (`:`) conditionals.
+- Configurable startup script support through `autoexec.zs`.
+- Menuconfig support for shell features, buffer sizes, history size, colors, and startup behavior.
+- Built-in commands for status, directory navigation, screen control, history, shell control, PATH inspection, version display, and system reset.
+- Human-readable Zeal OS error reporting and child-program exit-status handling.
+- Optional color support and configurable command-history capacity.
