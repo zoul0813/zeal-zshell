@@ -35,8 +35,9 @@ void path_set(dir_t* dir, char* path)
     uint8_t slashes  = 0;
     char* truncate_point = end;
 
-    p = end - 1;
-    while (p >= folder_start) {
+    p = end;
+    while (p > folder_start) {
+        p--;
         if (*p == PATH_SEP) {
             slashes++;
             if (slashes == 2) {
@@ -45,7 +46,6 @@ void path_set(dir_t* dir, char* path)
                 break;
             }
         }
-        p--;
     }
 
     // Build folder path
