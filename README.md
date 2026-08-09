@@ -17,20 +17,24 @@ You can either [build ZShell from source](#building-from-source), or use one of 
 
 ## Built-in commands
 
-| Command | Description |
-| ------- | ----------- |
-| `#` | display the last return code |
-| `cd` | change disk/directory |
-| `clear` | clear the screen |
-| `exit` | exit ZShell (when current shell, just restarts ZShell - __does not__ reset  system) |
-| `false` | always returns false, used for batch scripts |
-| `history` | show the command history (if enabled) |
-| `pwd` | print the working directory |
-| `reset` | soft reset the entire system |
-| `set` | set [env vars](#environment-variables) |
-| `true` | always returns true, used for batch scripts |
-| `ver` | show the current ZShell version |
-| `which` | show where a binary is located |
+| Command | Availability | Description |
+| ------- | ------------ | ----------- |
+| `#` | Optional | display the last return code |
+| `cd` | Always | change disk/directory |
+| `clear` | Optional | clear the screen |
+| `exec` | Optional | execute a ZScript |
+| `exit` | Optional | exit ZShell (when current shell, just restarts ZShell - __does not__ reset system) |
+| `false` | Optional | always returns false, used for batch scripts |
+| `help` | Always | list the built-in commands compiled into ZShell |
+| `history` | History | show the command history |
+| `pwd` | Optional | print the working directory |
+| `reset` | Optional | soft reset the entire system |
+| `set` | Always | set [env vars](#environment-variables) |
+| `true` | Optional | always returns true, used for batch scripts |
+| `ver` | Optional | show the current ZShell version |
+| `which` | Optional | show where a binary is located |
+
+Optional commands can be enabled or disabled in menuconfig. The `history` command follows the command-history feature setting. `cd`, `help`, and `set` cannot be disabled.
 
 ## ZScripts (batch processing)
 
@@ -119,9 +123,7 @@ zde cmake
 
 ZShell supports a simple menuconfig, similar to the Zeal 8-bit OS kernel config.
 
-```shell
-zde cmake --target menuconfig
-```
+Run `zde cmake`, then invoke the generated `menuconfig` build target.
 
 You can turn on/off various features of ZShell, such as [autoexec](#autoexec), command history, and color support.
 

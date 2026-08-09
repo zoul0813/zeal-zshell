@@ -39,27 +39,53 @@ set(ZSHELL_SOURCES
     "src/batch.c"
     "src/builtin.c"
     "src/process.c"
+    "src/builtins/cd.c"
+    "src/builtins/help.c"
+    "src/builtins/set.c"
 )
 
-set(ZSHELL_HISTORY_ENABLED ON)
 set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
     ${CMAKE_CURRENT_LIST_DIR}/.config
 )
-if(EXISTS ${CMAKE_CURRENT_LIST_DIR}/.config)
-    file(STRINGS ${CMAKE_CURRENT_LIST_DIR}/.config ZSHELL_HISTORY_CONFIG
-        REGEX "^CONFIG_HISTORY_ENABLED=y$"
-    )
-    if(NOT ZSHELL_HISTORY_CONFIG)
-        set(ZSHELL_HISTORY_ENABLED OFF)
+
+function(zshell_config_enabled CONFIG_NAME DEFAULT_VALUE RESULT_VAR)
+    set(CONFIG_ENABLED ${DEFAULT_VALUE})
+    if(EXISTS ${CMAKE_CURRENT_LIST_DIR}/.config)
+        file(STRINGS ${CMAKE_CURRENT_LIST_DIR}/.config CONFIG_ENABLED_LINE
+            REGEX "^CONFIG_${CONFIG_NAME}=y$"
+        )
+        file(STRINGS ${CMAKE_CURRENT_LIST_DIR}/.config CONFIG_DISABLED_LINE
+            REGEX "^# CONFIG_${CONFIG_NAME} is not set$"
+        )
+        if(CONFIG_ENABLED_LINE)
+            set(CONFIG_ENABLED ON)
+        elseif(CONFIG_DISABLED_LINE)
+            set(CONFIG_ENABLED OFF)
+        endif()
     endif()
-endif()
+    set(${RESULT_VAR} ${CONFIG_ENABLED} PARENT_SCOPE)
+endfunction()
+
+zshell_config_enabled(HISTORY_ENABLED ON ZSHELL_HISTORY_ENABLED)
 if(ZSHELL_HISTORY_ENABLED)
-    list(APPEND ZSHELL_SOURCES "src/history.c")
+    list(APPEND ZSHELL_SOURCES
+        "src/history.c"
+        "src/builtins/history.c"
+    )
 endif()
+
+foreach(BUILTIN_NAME HASH PWD EXIT EXEC CLEAR WHICH TRUE FALSE VER RESET)
+    zshell_config_enabled(BUILTIN_${BUILTIN_NAME} ON BUILTIN_ENABLED)
+    if(BUILTIN_ENABLED)
+        string(TOLOWER ${BUILTIN_NAME} BUILTIN_FILENAME)
+        list(APPEND ZSHELL_SOURCES "src/builtins/${BUILTIN_FILENAME}.c")
+    endif()
+endforeach()
 
 add_executable(${target_name} ${ZSHELL_SOURCES})
 
 target_include_directories(${target_name} PRIVATE $ENV{ZVB_SDK_PATH}/include)
+target_include_directories(${target_name} PRIVATE ${CMAKE_CURRENT_LIST_DIR}/src)
 target_include_directories(${target_name} PRIVATE ${CMAKE_CURRENT_LIST_DIR}/include)
 
 # Link with .lib extension for SDCC

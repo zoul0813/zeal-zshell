@@ -68,15 +68,15 @@ Combined command, history, PATH, and nested-batch storage is limited to 15,000 b
 - **HISTORY_MAX_ENTRIES**: Maximum history entries (1-32, default: 10)
 
 ### Features
+
 - **AUTOEXEC_ENABLED**: Enable/disable autoexec processing (default: enabled)
 - **COLOR_SUPPORT**: Enable/disable ANSI color support (default: enabled)
-- **PROMPT_CUSTOMIZATION**: Enable/disable prompt customization (default: enabled)
-- **TAB_COMPLETION**: Enable/disable tab completion (default: disabled)
-- **BUILTIN_COMMANDS**: Enable/disable built-in commands (default: enabled)
 
-### Debug and Development
-- **DEBUG_MODE**: Enable/disable debug mode (default: disabled)
-- **VERBOSE_ERRORS**: Enable/disable verbose error messages (default: enabled)
+### Built-in Commands
+
+The `#`, `pwd`, `exit`, `exec`, `clear`, `which`, `true`, `false`, `ver`, and `reset` commands each have an enabled-by-default option. Disabled handlers are omitted from both the command list and the linked binary.
+
+The internal `cd`, `help`, and `set` commands are always built. `history` is controlled only by **HISTORY_ENABLED**.
 
 ## Files
 

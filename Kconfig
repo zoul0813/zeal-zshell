@@ -20,23 +20,58 @@ config COLOR_SUPPORT
     help
       Enable ANSI color support in the shell.
 
-# config PROMPT_CUSTOMIZATION
-#     bool "Enable prompt customization"
-#     default y
-#     help
-#       Allow customization of the shell prompt.
+config AUTOEXEC_FILENAME
+    string "Autoexec filename"
+    depends on AUTOEXEC_ENABLED
+    default "B:/autoexec.zs"
+    help
+      Path and filename for the autoexec script that will be
+      automatically executed at shell startup.
 
-# config TAB_COMPLETION
-#     bool "Enable tab completion"
-#     default n
-#     help
-#       Enable tab completion for commands and filenames.
 
-# config BUILTIN_COMMANDS
-#     bool "Enable built-in commands"
-#     default y
-#     help
-#       Enable built-in shell commands like cd, ls, etc.
+endmenu
+
+menu "Built-in Commands"
+
+config BUILTIN_HASH
+    bool "Enable # status command"
+    default y
+
+config BUILTIN_PWD
+    bool "Enable pwd command"
+    default y
+
+config BUILTIN_EXIT
+    bool "Enable exit command"
+    default y
+
+config BUILTIN_EXEC
+    bool "Enable exec command"
+    default y
+
+config BUILTIN_CLEAR
+    bool "Enable clear command"
+    default y
+
+config BUILTIN_WHICH
+    bool "Enable which command"
+    default y
+
+config BUILTIN_TRUE
+    bool "Enable true command"
+    default y
+
+config BUILTIN_FALSE
+    bool "Enable false command"
+    default y
+
+config BUILTIN_VER
+    bool "Enable ver command"
+    default y
+
+config BUILTIN_RESET
+    bool "Enable reset command"
+    default y
 
 endmenu
 
@@ -70,29 +105,5 @@ config HISTORY_MAX_ENTRIES
     range 1 32
     help
       Maximum number of command history entries to keep.
-
-config AUTOEXEC_FILENAME
-    string "Autoexec filename"
-    depends on AUTOEXEC_ENABLED
-    default "B:/autoexec.zs"
-    help
-      Path and filename for the autoexec script that will be
-      automatically executed at shell startup.
-
-endmenu
-
-menu "Debug and Development"
-
-config DEBUG_MODE
-    bool "Enable debug mode"
-    default n
-    help
-      Enable debug output and additional error checking.
-
-config VERBOSE_ERRORS
-    bool "Enable verbose error messages"
-    default y
-    help
-      Show detailed error messages instead of just error codes.
 
 endmenu

@@ -15,6 +15,24 @@ CONFIG_LIMITS = {
 }
 CONFIGURABLE_STORAGE_BUDGET = 15000
 ZEAL_PATH_MAX = 128
+BUILTIN_DEFAULTS = (
+    "HASH",
+    "PWD",
+    "EXIT",
+    "EXEC",
+    "CLEAR",
+    "WHICH",
+    "TRUE",
+    "FALSE",
+    "VER",
+    "RESET",
+)
+SUPPORTED_CONFIGS = set(CONFIG_LIMITS) | {
+    "AUTOEXEC_ENABLED",
+    "AUTOEXEC_FILENAME",
+    "COLOR_SUPPORT",
+    "HISTORY_ENABLED",
+} | {f"BUILTIN_{name}" for name in BUILTIN_DEFAULTS}
 
 
 def parse_config(config_file):
@@ -28,6 +46,11 @@ def parse_config(config_file):
     with open(config_file, "r") as f:
         for line in f:
             line = line.strip()
+
+            match = re.match(r"# CONFIG_([A-Z_]+) is not set$", line)
+            if match:
+                config[match.group(1)] = False
+                continue
 
             # Skip comments and empty lines
             if line.startswith("#") or not line:
@@ -96,6 +119,8 @@ def generate_header(config, output_file):
 
         # Sort keys for consistent output
         for key in sorted(config.keys()):
+            if key not in SUPPORTED_CONFIGS:
+                continue
             value = config[key]
 
             if isinstance(value, bool):
@@ -129,13 +154,11 @@ def generate_header(config, output_file):
         f.write("#endif\n")
         f.write("#define AUTOEXEC_FILENAME CONFIG_AUTOEXEC_FILENAME\n\n")
 
-        f.write("#ifndef CONFIG_DEBUG_MODE\n")
-        f.write("#define CONFIG_DEBUG_MODE 0\n")
-        f.write("#endif\n\n")
-
-        f.write("#ifndef CONFIG_VERBOSE_ERRORS\n")
-        f.write("#define CONFIG_VERBOSE_ERRORS 0\n")
-        f.write("#endif\n\n")
+        for name in BUILTIN_DEFAULTS:
+            key = f"BUILTIN_{name}"
+            if key not in config:
+                f.write(f"#define CONFIG_{key} 1\n")
+        f.write("\n")
 
         # Add default values for backward compatibility
         f.write("/* Default values for constants */\n")
