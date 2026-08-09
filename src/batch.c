@@ -15,7 +15,7 @@
 
 #define BATCH_READ_BUFFER_SIZE 128
 
-static char line[COMMAND_MAX];
+static char lines[BATCH_MAX_DEPTH][COMMAND_MAX];
 static uint8_t batch_depth = 0;
 
 zos_err_t batch_process(const char* path, batch_options_e options) {
@@ -23,6 +23,7 @@ zos_err_t batch_process(const char* path, batch_options_e options) {
     (void*)options;
 
     if(batch_depth >= BATCH_MAX_DEPTH) {
+        put_s("<batch depth>\n");
         return ERR_NO_MORE_MEMORY;
     }
 
@@ -37,6 +38,7 @@ zos_err_t batch_process(const char* path, batch_options_e options) {
     }
 
     batch_depth++;
+    char *line = lines[batch_depth - 1];
     char buffer[BATCH_READ_BUFFER_SIZE];
 
     // TODO: add option to "set quiet=1" for options |= BATCH_QUIET
