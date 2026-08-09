@@ -5,6 +5,7 @@
 ### Added
 
 - Added left and right cursor navigation while editing commands.
+- Added Home and End navigation for moving to the start or end of the command.
 - Added Delete-key support for removing the character under the cursor.
 - Added configurable ZScript nesting depth, from 1 to 16 levels.
 - Added menuconfig options for enabling or disabling individual optional built-in commands.

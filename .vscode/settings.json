@@ -1,6 +1,8 @@
 {
   "C_Cpp.default.includePath": [
     "${workspaceFolder}/include",
+    "${workspaceFolder}/src/",
+    "${workspaceFolder}/src/**/*",
     "${env:ZVB_SDK_PATH}/include",
     "${env:ZVB_SDK_PATH}/sdcc",
     "${env:ZOS_PATH}/kernel_headers/sdcc/include",

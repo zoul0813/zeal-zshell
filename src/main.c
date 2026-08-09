@@ -122,10 +122,6 @@ int main(int argc, char **argv) {
             kb_keys_t key = getkey();
             if(key == 0) continue;
             switch(key) {
-                case KB_END: {
-                    goto quit;
-                }
-
 #if HISTORY_ENABLED
                 // History navigation
                 case KB_UP_ARROW: {
@@ -160,6 +156,12 @@ int main(int argc, char **argv) {
                 case KB_RIGHT_ARROW: {
                     prompt_move_right();
                 } break;
+                case KB_HOME: {
+                    prompt_move_home();
+                } break;
+                case KB_END: {
+                    prompt_move_end();
+                } break;
                 case KB_KEY_BACKSPACE: {
                     prompt_backspace();
                 } break;
@@ -174,10 +176,4 @@ int main(int argc, char **argv) {
         }
 end_outer_loop:
     }
-quit:
-
-    err = kb_mode_default();
-    handle_error(err, "reset keyboard", 1);
-    put_c(CH_NEWLINE);
-    return 0;
 }

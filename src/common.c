@@ -5,6 +5,7 @@
 #include <zos_sys.h>
 #include <zos_video.h>
 #include <core.h>
+#include <keyboard.h>
 #include "config.h"
 #include "common.h"
 
@@ -46,6 +47,7 @@ const char *ERROR_STRINGS[] = {
 const uint8_t ERROR_STRINGS_LEN = sizeof(ERROR_STRINGS) / sizeof(ERROR_STRINGS[0]);
 
 int __exit(zos_err_t err) {
+  (void)kb_mode_default();
   exit(err);
   return err;
 }

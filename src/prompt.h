@@ -13,6 +13,8 @@ char *prompt_command(void);
 uint16_t prompt_length(void);
 void prompt_move_left(void);
 void prompt_move_right(void);
+void prompt_move_home(void);
+void prompt_move_end(void);
 void prompt_backspace(void);
 void prompt_delete(void);
 void prompt_insert(unsigned char c);

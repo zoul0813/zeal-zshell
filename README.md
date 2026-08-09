@@ -36,6 +36,16 @@ You can either [build ZShell from source](#building-from-source), or use one of 
 
 Optional commands can be enabled or disabled in menuconfig. The `history` command follows the command-history feature setting. `cd`, `help`, and `set` cannot be disabled.
 
+## Command-line editing
+
+- Left and Right move the cursor one character.
+- Home moves the cursor to the start of the command.
+- End moves the cursor to the end of the command.
+- Backspace removes the character before the cursor.
+- Delete removes the character under the cursor.
+- Escape clears the current command.
+- Up and Down navigate command history when history support is enabled.
+
 ## ZScripts (batch processing)
 
 ZShell supports batch scripts with a `.zs` extension, and will process these similar to

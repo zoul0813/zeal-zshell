@@ -114,6 +114,16 @@ void prompt_move_right(void) {
     cursor_pos++;
 }
 
+void prompt_move_home(void) {
+    cursor_left(cursor_pos);
+    cursor_pos = 0;
+}
+
+void prompt_move_end(void) {
+    cursor_right(command_length - cursor_pos);
+    cursor_pos = command_length;
+}
+
 void prompt_backspace(void) {
     uint16_t i;
     uint16_t repaint_length;
