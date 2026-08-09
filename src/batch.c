@@ -133,9 +133,6 @@ zos_err_t batch_process(const char* path, batch_options_e options) {
     }
 
     if(total_read < 1) {
-        put_s("ERROR: ");
-        put_u16(0);
-        put_s(" bytes read\n");
         close(f);
         batch_depth--;
         return ERR_SUCCESS;
