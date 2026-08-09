@@ -18,7 +18,6 @@
 
 static unsigned char buffer[COMMAND_MAX];
 static uint16_t pos = 0;
-static uint16_t size;
 static zos_err_t err;
 static zos_text_area_t text_area;
 #if AUTOEXEC_ENABLED

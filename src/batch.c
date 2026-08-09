@@ -71,9 +71,6 @@ static zos_err_t line_too_long(zos_dev_t f) {
 }
 
 zos_err_t batch_process(const char* path, batch_options_e options) {
-    (void*)path;
-    (void*)options;
-
     if(batch_depth >= BATCH_MAX_DEPTH) {
         put_s("<batch depth>\n");
         return ERR_NO_MORE_MEMORY;

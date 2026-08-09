@@ -74,7 +74,6 @@ void handle_error(zos_err_t err, char *msg, uint8_t fatal) {
 
 #if CONFIG_COLOR_SUPPORT
 void setcolor(uint8_t fg, uint8_t bg) {
-    uint16_t color = (bg << 8) | fg;
     ioctl(DEV_STDOUT, CMD_SET_COLORS, TEXT_COLOR(fg, bg));
 }
 #endif
