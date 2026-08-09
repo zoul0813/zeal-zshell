@@ -7,6 +7,15 @@ import sys
 import os
 import re
 
+CONFIG_LIMITS = {
+    "COMMAND_MAX": (64, 256, 256),
+    "MAX_PATHS": (1, 16, 8),
+    "BATCH_MAX_DEPTH": (1, 16, 4),
+    "HISTORY_MAX_ENTRIES": (1, 32, 10),
+}
+CONFIGURABLE_STORAGE_BUDGET = 15000
+ZEAL_PATH_MAX = 128
+
 
 def parse_config(config_file):
     """Parse the .config file and return a dictionary of config values."""
@@ -46,6 +55,32 @@ def parse_config(config_file):
                         config[name] = value
 
     return config
+
+
+def validate_config(config):
+    """Reject unsafe numeric values and aggregate static-memory usage."""
+    values = {}
+    for key, (minimum, maximum, default) in CONFIG_LIMITS.items():
+        value = config.get(key, default)
+        if type(value) is not int or not minimum <= value <= maximum:
+            raise ValueError(
+                f"CONFIG_{key} must be an integer from {minimum} to {maximum}"
+            )
+        values[key] = value
+
+    command_max = values["COMMAND_MAX"]
+    configured_storage = (
+        command_max
+        + values["HISTORY_MAX_ENTRIES"] * (command_max + 5)
+        + values["MAX_PATHS"] * ZEAL_PATH_MAX
+        + values["BATCH_MAX_DEPTH"] * command_max
+    )
+    if configured_storage > CONFIGURABLE_STORAGE_BUDGET:
+        raise ValueError(
+            "configured static storage "
+            f"({configured_storage} bytes) exceeds "
+            f"{CONFIGURABLE_STORAGE_BUDGET}-byte budget"
+        )
 
 
 def generate_header(config, output_file):
@@ -138,6 +173,11 @@ def main():
         os.makedirs(output_dir)
 
     config = parse_config(config_file)
+    try:
+        validate_config(config)
+    except ValueError as error:
+        print(f"Error: {error}", file=sys.stderr)
+        sys.exit(1)
     generate_header(config, output_file)
 
     print(f"Generated {output_file} from {config_file}")

@@ -56,14 +56,16 @@ This builds the shell with your current configuration.
 
 ### Buffer and Memory Settings
 
-- **COMMAND_MAX**: Maximum command buffer size (64-1024 bytes, default: 256)
-- **MAX_PATHS**: Maximum number of paths (1-32, default: 8)
+- **COMMAND_MAX**: Maximum command buffer size (64-256 bytes, default: 256)
+- **MAX_PATHS**: Maximum number of paths (1-16, default: 8)
 - **BATCH_MAX_DEPTH**: Maximum active nested batch scripts (1-16, default: 4)
+
+Combined command, history, PATH, and nested-batch storage is limited to 15,000 bytes. Unsafe manual `.config` combinations fail during header generation.
 
 ### History Settings
 
 - **HISTORY_ENABLED**: Enable/disable command history (default: enabled)
-- **HISTORY_MAX_ENTRIES**: Maximum history entries (1-64, default: 10)
+- **HISTORY_MAX_ENTRIES**: Maximum history entries (1-32, default: 10)
 
 ### Features
 - **AUTOEXEC_ENABLED**: Enable/disable autoexec processing (default: enabled)

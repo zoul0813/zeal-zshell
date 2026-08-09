@@ -45,14 +45,14 @@ menu "Buffer and Memory Settings"
 config COMMAND_MAX
     int "Maximum command buffer size"
     default 256
-    range 64 1024
+    range 64 256
     help
       Maximum size of the command input buffer in bytes.
 
 config MAX_PATHS
     int "Maximum number of paths"
     default 8
-    range 1 32
+    range 1 16
     help
       Maximum number of paths that can be stored in the shell.
 
@@ -67,7 +67,7 @@ config HISTORY_MAX_ENTRIES
     int "Maximum history entries"
     depends on HISTORY_ENABLED
     default 10
-    range 1 64
+    range 1 32
     help
       Maximum number of command history entries to keep.
 
