@@ -20,6 +20,7 @@ static unsigned char buffer[COMMAND_MAX];
 static uint16_t pos = 0;
 static uint16_t size;
 static zos_err_t err;
+static zos_text_area_t text_area;
 #if AUTOEXEC_ENABLED
 static zos_stat_t zos_stat;
 #endif
@@ -39,10 +40,13 @@ void prompt(char *cmd) {
 }
 
 void clear_command(void) {
+    uint16_t clear_length = pos + 4u;
+
     put_c(CH_RETURN);
-    for(uint16_t i = 0; i < pos + 4; i++) {
+    for(uint16_t i = 0; i < clear_length; i++) {
         put_c(CH_SPACE);
     }
+    put_c(CH_RETURN);
     buffer[0] = CH_NULL;
     pos = 0;
     fflush_stdout();
@@ -151,6 +155,8 @@ int main(int argc, char **argv) {
 
     err = kb_mode_non_block_raw();
     handle_error(err, "init keyboard", 1);
+    err = ioctl(DEV_STDOUT, CMD_GET_AREA, &text_area);
+    handle_error(err, "get text area", 1);
 
     for(;;) {
         prompt(NULL);
@@ -211,9 +217,18 @@ int main(int argc, char **argv) {
                     if(pos == 0) break;
                     pos--;
                     buffer[pos] = CH_NULL;
-                    uint8_t x                = zvb_peri_text_curs_x - 1;
+                    uint8_t x = zvb_peri_text_curs_x;
+                    uint8_t y = zvb_peri_text_curs_y;
+                    if(x == 0) {
+                        x = text_area.width - 1;
+                        if(y > 0) y--;
+                    } else {
+                        x--;
+                    }
+                    zvb_peri_text_curs_y     = y;
                     zvb_peri_text_curs_x     = x;
                     zvb_peri_text_print_char = CH_NULL;
+                    zvb_peri_text_curs_y     = y;
                     zvb_peri_text_curs_x     = x;
                 } break;
                 default: {
