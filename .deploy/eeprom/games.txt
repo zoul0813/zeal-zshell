@@ -1,0 +1,27 @@
+ZSHELL LESSON 9 / PLAY SOMETHING ON T:/
+=====================================
+
+The community TF image contains games under T:/games/. They are not in
+the demo's default PATH. Browse the installed files rather than guessing.
+
+TRY IT
+  zc                  Browse files with Zeal Commander
+  ls T:/games/        List this release's installed games
+
+TO LAUNCH SNAKE, WHEN PRESENT
+  cd T:/games/
+  ./snake
+
+Other community examples include ./bricked, ./tetris, and ./zealmine
+from T:/games/. Releases can add, rename, or omit programs.
+
+Some games have an assets directory and need their own working folder:
+  cd T:/games/checkers/
+  ./zcheckers
+
+Keep the assets beside the program. Do not try to execute .zar, .ztp,
+or .zts data files. Follow each game's on-screen controls to start/quit.
+If a game has no working quit option, use the page's Reset to restart
+the guest. Saved disks remain; running game state does not.
+
+NEXT: about-demos    MENU: welcome

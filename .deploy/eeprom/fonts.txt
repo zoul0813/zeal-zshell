@@ -1,0 +1,26 @@
+ZSHELL LESSON 8 / FONTS AND THE DISPLAY
+=====================================
+
+The guest display is 80 columns by 40 rows. It has no scrollback buffer,
+so these lessons clear the screen and keep each message on one page.
+The welcome banner uses CP437 block and box-drawing characters.
+
+TRY IT
+  ls T:/sys/          Look for fonts included in your community image
+  which setfont      Find the coreutils font loader
+
+If your image includes CAFE.f12, for example, you can use:
+  setfont T:/sys/CAFE.f12
+
+Font files and their names vary by release. Use a real .f12 filename
+from your disk; a missing example file cannot be loaded. Some releases
+do not include extra fonts. Keep CP437 support for the banner's artwork.
+
+The browser page's light/dark theme changes the page around the screen.
+It does not recolor the guest shell. Programs can set their own colors.
+Use the page's Reset to return to the boot display and default font.
+
+To see the welcome banner again after trying a font, type welcome.
+The lesson text is plain ASCII so it remains easy to read.
+
+NEXT: about-games    MENU: welcome

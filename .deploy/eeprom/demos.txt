@@ -1,0 +1,29 @@
+ZSHELL LESSON 10 / DEMOS AND APPLICATIONS
+=======================================
+
+T:/demos/ holds graphics demos; T:/apps/ holds applications. The exact
+selection follows the community image used for this deployment.
+
+TRY IT
+  ls T:/demos/       Look for installed demos
+  cd T:/demos/
+  ./boing            Launch the Boing demo, when present
+
+Other community examples are ./plasma, ./matrix, and ./truchet in the
+same folder. Launch one at a time and follow its own controls to exit.
+Use the page's Reset if a demo offers no exit path.
+
+APPLICATIONS
+  zc                 Browse drives with Zeal Commander
+  ls T:/apps/        See other installed applications
+  which zc           See where an application was found
+
+T:/apps/ is in the default PATH, so applications there can normally be
+started by name. Games and demos use their folders or explicit paths.
+If a program needs data files, first cd to the folder containing them.
+
+Congratulations: you have toured the shell, scripts, storage, and software!
+Replay any lesson by name. Nothing in these lesson scripts installs or
+launches games automatically; you choose which commands to try.
+
+MENU: welcome        START AGAIN: about-shell

@@ -1,0 +1,28 @@
+ZSHELL LESSON 3 / FINDING COMMANDS WITH PATH
+==========================================
+
+PATH is an ordered, comma-separated list of directories to search.
+This demo starts with T:/apps/,T:/bin/,A:/,B:/.
+
+TRY IT
+  set              Show PATH in assignment form
+  set PATH         List the search directories with their indexes
+  which cat        Find cat in PATH
+  which cd         Identify a built-in command
+  about-paths      Find this lesson on B:/ without typing .zs
+
+Built-ins win first. For other names, ZShell searches every PATH entry
+for the exact name, then every entry for name.bin, then name.zs.
+The current directory is not searched automatically.
+
+  ./snake          Run an exact filename in the current directory
+  T:/games/snake   Run an exact drive-qualified filename
+
+Explicit paths do not guess extensions. To restore the demo's PATH:
+  set PATH=T:/apps/,T:/bin/,A:/,B:/
+
+Use no spaces around = or commas. Entries cannot be empty. PATH belongs
+to the shell; programs do not inherit it as an environment variable.
+If you remove B:/ from PATH, use B:/welcome.zs to get back to the menu.
+
+NEXT: about-files    MENU: welcome

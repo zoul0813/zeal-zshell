@@ -1,0 +1,30 @@
+ZSHELL LESSON 6 / SUCCESS, FAILURE, AND BRANCHES
+=============================================
+
+Each command returns a status: 0 means success; nonzero means failure.
+The # command prints the previous status in decimal, then succeeds itself.
+A failed interactive command also prints an error and turns the prompt red.
+
+TRY IT AT THE PROMPT, ONE COMMAND AT A TIME
+  false
+  #
+  true
+  #
+
+Expect 1 after false and 0 after true. The failure beep is intentional.
+
+INSIDE A .zs FILE
+  false
+  ? echo This success line is skipped
+  : echo This failure line runs
+  ? echo The handler succeeded, so this line runs too
+
+? runs only on success; : runs only on failure. A skipped line keeps the
+status unchanged. Each executed line replaces it, even inside a chain.
+These prefixes are script syntax, not interactive prompt commands.
+
+An unhandled failure stops before the next ordinary command. After a
+conditional group, the next ordinary line starts fresh and continues.
+At end of file, the script returns the last status instead.
+
+NEXT: about-disks    MENU: welcome

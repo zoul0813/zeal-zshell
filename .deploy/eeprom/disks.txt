@@ -1,0 +1,26 @@
+ZSHELL LESSON 7 / YOUR BROWSER'S DISKS
+====================================
+
+This demo keeps its disk images in browser storage called OPFS.
+Completed TF and EEPROM device writes persist automatically in this
+browser profile. Your files do not change anyone else's demo.
+History and running programs are in memory, not part of those disks.
+
+PAGE CONTROLS
+  Reset          Restart the emulator and guest, keeping saved disks
+  Unmute         Resume audio if browser autoplay rules suspended it
+  Toggle FPS     Show or hide the emulator frame rate
+  Update Images  Replace changed saved images with deployed versions
+  Clear Data     Restore all configured disks from the deployment
+
+Update Images appears when an image change is detected. Update Images
+and Clear Data ask before discarding local changes and guest RAM.
+A new deployment does not silently replace your saved disk images.
+
+Only writes that reach a device are covered by automatic persistence.
+Programs may still hold unsaved data. ROM/NOR writes stay buffered until
+an orderly flush, such as the page's Reset; closing a tab can lose them.
+Browser site-data clearing can remove disks. Old IndexedDB saves are not
+migrated. There is no Save Data button or automatic memory fallback.
+
+NEXT: about-fonts    MENU: welcome

@@ -9,6 +9,9 @@ A new shell for Zeal 8-bit OS, with history, batch processing, and a few other e
 >
 > [<kbd> <br> <br> &nbsp;&nbsp; Try it now! &nbsp;&nbsp; <br> <br> </kbd>](https://zoul0813.github.io/zeal-zshell/)
 
+The demo includes ten short interactive lessons on `B:/`. Type `about-shell` to
+start, `about-games` for games on `T:/`, or `welcome` to return to the lesson menu.
+
 ## Documentation
 
 The [ZShell documentation](docs/README.md) covers all shell features and the browser demo.

@@ -8,10 +8,25 @@
 [22;35;40mº  [22;95;40m     ß    ÜÛÛß ÜÛÛÛÛÜÜÜÜÜÜ    [22;35;40m  ³  [22;95;40mTRY A COMMAND                          [22;35;40m  º
 [22;35;40mº  [22;95;40m        ÜÛÛ  ÜÛÛÛÛÛÛÛÛÛÛÛÛÛÛÜ [22;35;40m  ³  [22;96;40mtree     Explore your files            [22;35;40m  º
 [22;35;40mº  [22;95;40m     ÜÜÛÛß ÜÛÛß            ßÛÜ[22;35;40m  ³  [22;96;40mzc       Open Zeal Commander           [22;35;40m  º
-[22;35;40mº  [22;95;40m   ÜÜÛÛß ÜÛÛÛß              ÛÛ[22;35;40m  ³  [22;96;40msetfont T:/sys/CAFE.f12                [22;35;40m  º
-[22;35;40mº  [22;95;40m ÜÛÛÛ   ÛÛÛÛÛÛÛÛÛÛ  >_      ÛÛ[22;35;40m  ³  [22;37;40m         More fonts in T:/sys/         [22;35;40m  º
+[22;35;40mº  [22;95;40m   ÜÜÛÛß ÜÛÛÛß              ÛÛ[22;35;40m  ³  [22;96;40mls T:/games/                           [22;35;40m  º
+[22;35;40mº  [22;95;40m ÜÛÛÛ   ÛÛÛÛÛÛÛÛÛÛ  >_      ÛÛ[22;35;40m  ³  [22;37;40mMore launch tips: about-games          [22;35;40m  º
 [22;35;40mº  [22;95;40m ÛÛß                      ÜÛÛß[22;35;40m  ³  [22;37;40m                                       [22;35;40m  º
 [22;35;40mº  [22;95;40m ßÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛÛß  [22;35;40m  ³  [22;37;40mhelp     List built-in commands        [22;35;40m  º
 [22;35;40mº  [22;95;40m                              [22;35;40m  ³  [22;37;40mUp/Down  Browse command history        [22;35;40m  º
 [22;35;40mÈÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼
+
+[22;95;40mLEARN ZSHELL - type a lesson name and press Enter
+
+[22;96;40m  about-shell    [22;37;40mStart here: commands and built-ins
+[22;96;40m  about-keys     [22;37;40mEdit commands and browse history
+[22;96;40m  about-paths    [22;37;40mFind programs and scripts with PATH
+[22;96;40m  about-files    [22;37;40mNavigate drives, directories, and files
+[22;96;40m  about-zscript  [22;37;40mRead and run a real ZScript
+[22;96;40m  about-status   [22;37;40mUse success/failure conditionals
+[22;96;40m  about-disks    [22;37;40mUnderstand browser storage and resets
+[22;96;40m  about-fonts    [22;37;40mExplore fonts and the guest display
+[22;96;40m  about-games    [22;37;40mFind and launch games on T:/
+[22;96;40m  about-demos    [22;37;40mDiscover demos and applications
+
+[22;37;40mEach lesson clears the screen. Type welcome to return to this menu.
 [0;22;37;40m

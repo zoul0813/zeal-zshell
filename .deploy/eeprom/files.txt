@@ -1,0 +1,27 @@
+ZSHELL LESSON 4 / DRIVES, DIRECTORIES, AND FILES
+=============================================
+
+In this demo:
+  A:/   ROM disk: ZShell and coreutils
+  B:/   EEPROM disk: startup, welcome banner, and these lessons
+  T:/   Community TF image: applications, games, demos, and utilities
+
+TRY IT
+  pwd                  Print the full current directory
+  ls B:/               List the lessons and message files
+  cat B:/paths.txt      Read a lesson's message file directly
+  cd T:/games/         Change to the games directory
+  pwd                  Check where you are
+  cd T:/               Return to the TF root
+
+Use / between directories. A trailing / on cd is optional. cd requires
+a path; it does not return to a home directory when used without one.
+The prompt abbreviates deep paths, while pwd always shows the full path.
+
+cp, mv, mkdir, rm, ls, and cat are external coreutils programs. Use cat
+for plain text and acat for ANSI art, such as B:/welcome.ans.
+
+Use zc to browse larger directories interactively. A long tree or ls
+listing can run beyond the visible screen; there is no scrollback.
+
+NEXT: about-zscript  MENU: welcome

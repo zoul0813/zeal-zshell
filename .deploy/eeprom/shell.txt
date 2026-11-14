@@ -1,0 +1,25 @@
+ZSHELL LESSON 1 / MEET YOUR SHELL
+================================
+
+ZShell is the command prompt for Zeal 8-bit OS. Type a command and
+press Enter. Click the emulator screen first to give it keyboard focus.
+
+TRY IT
+  help              List the built-in commands in this build
+  ver               Show the ZShell version
+  pwd               Show your full current directory
+  which echo        Find the program that runs when you type echo
+  echo Hello Zeal!   Run an external program from coreutils
+
+Built-ins such as cd, help, and set run inside ZShell. Utilities such as
+ls, cat, cp, and echo are separate programs supplied by coreutils.
+Games and demos are separate programs too.
+
+Commands use one line each. ZShell does not implement pipes, output
+redirection, wildcard expansion, or Unix-style command chaining.
+Quotes are passed to programs; the shell does not remove them.
+
+Lesson scripts only clear the display and show text. The TRY IT commands
+are suggestions for you to enter afterward, not commands run for you.
+
+NEXT: about-keys     MENU: welcome

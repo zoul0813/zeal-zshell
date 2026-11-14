@@ -1,0 +1,28 @@
+ZSHELL LESSON 5 / YOUR FIRST ZSCRIPT
+==================================
+
+A ZScript is a plain text file ending in .zs, with one command per line.
+It runs in this shell, so PATH and directory changes remain afterward.
+A line beginning with ; is a comment. Blank lines are ignored.
+
+TRY IT
+  cat B:/about-paths.zs      Inspect a real lesson script
+  B:/about-paths.zs          Run it by its exact path
+  about-paths               Let PATH find it and add .zs
+
+The lesson script contains:
+  clear
+  A:/cat B:/paths.txt
+
+There is no hidden application here: it clears the screen and runs cat!
+Direct .zs execution is quiet; program output is still displayed.
+exec B:/about-paths.zs also works and prints an exec diagnostic.
+
+Scripts do not take positional arguments. Use LF line endings when
+creating scripts; there is no variable expansion, quoting, or loop syntax.
+A line can contain at most 255 characters with the default build.
+Scripts may call other scripts, with 4 active scripts allowed by default.
+
+Next, learn how ? and : let scripts react to success and failure.
+
+NEXT: about-status   MENU: welcome

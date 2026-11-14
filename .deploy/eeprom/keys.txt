@@ -1,0 +1,27 @@
+ZSHELL LESSON 2 / EDITING AND HISTORY
+===================================
+
+You can fix a command before pressing Enter:
+  Left / Right   Move through the command
+  Home / End     Jump to the start / end of the command
+  Backspace      Delete the character before the cursor
+  Delete         Delete the character under the cursor
+  Escape         Clear the line without running it
+
+TRY IT
+  Type echo Helo, move the cursor, and insert the missing l.
+  Press Enter, then Up to recall your command. Edit it and run it again.
+
+Up walks toward older commands; Down walks toward newer ones and then
+restores the draft you were typing. Navigation stops instead of wrapping.
+Editing a recalled command makes it a new draft.
+
+  history          Show the recent commands, oldest first
+  history clear    Empty this session's history
+
+The default capacity is 10 distinct commands. Repeating a command moves
+it to the newest position. History lasts for this shell session only.
+The default input limit is 255 characters. A full input buffer beeps.
+Leading/trailing spaces are trimmed; repeated spaces collapse to one.
+
+NEXT: about-paths    MENU: welcome
