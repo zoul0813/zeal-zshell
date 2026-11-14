@@ -113,6 +113,10 @@ For an ordinary command such as `game`:
 
 Extension priority applies across the whole PATH: `B:/game` beats `A:/game.bin`
 even when `A:/` appears first. Supplying an extension disables suffix guessing.
+Guessed names that exceed the OS filename limit are skipped, so an oversized
+`.bin` guess does not block a valid `.zs` file. Explicit invalid names still
+report their filesystem error.
+
 Directories are not executable matches. Missing entries allow lookup to
 continue; other filesystem errors can stop the search.
 

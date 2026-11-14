@@ -43,6 +43,14 @@ static zos_err_t find_with_extension(unsigned char* name, const char* extension,
     uint16_t name_len = str_len(name);
     uint16_t ext_len = extension ? str_len(extension) : 0;
 
+    // A guessed suffix may exceed the filename limit even when another fits
+    // (for example, a 13-character name can have .zs but cannot have .bin).
+    // Skip only impossible guesses; explicit names still reach stat unchanged.
+    unsigned char* filename = str_chrr(name, PATH_SEP);
+    filename = filename ? filename + 1 : name;
+    if (ext_len && str_len(filename) + ext_len > FILENAME_LEN_MAX)
+        return ERR_NO_SUCH_ENTRY;
+
     // Try in current location first
     if (shallow) {
         if (name_len + ext_len >= PATH_MAX)

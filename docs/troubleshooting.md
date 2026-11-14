@@ -106,6 +106,7 @@ as `echo` installed, run scripts explicitly, for example:
 ./tests/nested.zs
 ./tests/status.zs
 ./tests/path.zs
+./tests/lookup.zs
 ./tests/cd.zs
 ./tests/root-path.zs
 ./tests/empty.zs
@@ -114,8 +115,9 @@ as `echo` installed, run scripts explicitly, for example:
 ./tests/startup.zs
 ```
 
-The scripts cover nested parser state, statuses, PATH validation, directory
-errors, empty files, depth rejection, oversized lines, and startup flags. Some
+The scripts cover nested parser state, statuses, PATH validation, long-name
+extension lookup, directory errors, empty files, depth rejection, oversized
+lines, and startup flags. Some
 print diagnostic messages rather than checking every outcome automatically.
 Depth/line-limit examples assume default settings; startup examples require a
 `zshell` executable discoverable in PATH. PATH and directory tests change shell
