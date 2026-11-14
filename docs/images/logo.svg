@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 240" role="img" aria-labelledby="title desc">
+  <title id="title">ZShell</title>
+  <desc id="desc">A ribbon-shaped Z with a terminal prompt beside the ZShell wordmark.</desc>
+  <style>
+    :root { color: #593662; }
+    @media (prefers-color-scheme: dark) { :root { color: #c6add1; } }
+  </style>
+  <g fill="none" stroke="currentColor" stroke-width="19" stroke-linejoin="round">
+    <!-- The open ribbon follows the Zeal Z and curls around the terminal prompt. -->
+    <path d="M70 103 29 62Q12 45 29 30Q35 25 46 25H247Q267 25 267 41Q267 49 258 57L90 207H253Q282 207 282 180Q282 153 253 153H185"/>
+    <path d="M72 66H196L42 203Q38 207 44 207H253" stroke-linejoin="miter"/>
+    <path d="m199 172 15 10-15 10m29 0h15" stroke-width="8" stroke-linecap="round"/>
+  </g>
+  <!-- Outlined lettering keeps the logo independent of installed fonts. -->
+  <g fill="none" stroke="currentColor" stroke-width="24" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M344 65H427L344 180H427"/>
+    <path d="M540 65H490C453 65 453 122 490 122H510C549 122 549 180 510 180H464"/>
+    <path d="M580 60V180M580 134C580 98 649 98 649 134V180"/>
+    <path d="M769 172C758 181 746 183 731 180C687 172 688 112 731 112C757 112 772 129 772 147H701"/>
+    <path d="M818 60V180M866 60V180"/>
+  </g>
+</svg>

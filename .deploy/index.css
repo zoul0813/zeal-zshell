@@ -38,13 +38,28 @@ body {
 
 header {
     display: grid;
-    grid-template-columns: max-content 1fr;
+    grid-template-columns: minmax(0, 1fr) auto;
     gap: 1rem;
     align-items: center;
     margin-block: 1.25rem;
 
     h1 {
         margin: 0;
+        min-width: 0;
+    }
+
+    .logo {
+        display: block;
+        width: min(100%, 180px);
+        height: auto;
+    }
+
+    .subtitle {
+        display: block;
+        color: var(--muted);
+        font-size: 1rem;
+        font-weight: normal;
+        margin-top: .25rem;
     }
 
     nav {
