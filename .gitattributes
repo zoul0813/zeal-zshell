@@ -1,0 +1,2 @@
+# Generated ANSI artwork contains CP437 bytes and intentional CRLF line endings.
+.deploy/eeprom/welcome.ans -text -diff

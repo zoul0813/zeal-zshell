@@ -96,8 +96,27 @@ The demo's [autoexec](../.deploy/eeprom/autoexec.zs) sets:
 ```text
 set PATH=T:/apps/,T:/bin/,A:/,B:/
 cd T:/
-cat b:/welcome.txt
+acat b:/welcome.ans
 ```
+
+The welcome file is a 78-column, 16-row CP437 banner with a half-block version
+of the approved Z mark beside the welcome text. It fits within the default
+80-column, 40-row display. Use `acat`, which interprets its ANSI color sequences;
+plain `cat` does not render ANSI. It uses the default 16-color palette's magenta,
+bright magenta, cyan, and gray on black, rather than unsupported true-color
+escape sequences. A custom font must retain CP437 block and box-drawing glyphs.
+
+The editable source is [`scripts/generate_welcome.py`](../scripts/generate_welcome.py).
+Regenerate the checked-in CP437 file after editing its artwork or text:
+
+```sh
+python3 scripts/generate_welcome.py
+```
+
+Do not save `.deploy/eeprom/welcome.ans` as UTF-8: its glyphs must remain single
+CP437 bytes. The file uses CRLF for `acat` cursor alignment; ZScript source files
+such as `autoexec.zs` still use LF line endings. The banner restores normal text
+colors before returning to the prompt and does not clear existing boot output.
 
 The set of programs on `T:` follows the selected community release. Commands
 mentioned by the welcome text are external programs and depend on that image.

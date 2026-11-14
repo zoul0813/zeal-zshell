@@ -121,7 +121,7 @@ For example:
 ; B:/autoexec.zs
 set PATH=T:/apps/,T:/bin/,A:/,B:/
 cd T:/
-cat B:/welcome.txt
+acat B:/welcome.ans
 ```
 
 Autoexec uses the same [ZScript syntax](zscripts.md) as other scripts. It can set

@@ -1,22 +1,22 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 240" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 878 233" role="img" aria-labelledby="title desc">
   <title id="title">ZShell</title>
-  <desc id="desc">A ribbon-shaped Z with a terminal prompt beside the ZShell wordmark.</desc>
+  <desc id="desc">The Zeal-style Z ribbon and terminal prompt beside the ZShell wordmark.</desc>
   <style>
     :root { color: #593662; }
     @media (prefers-color-scheme: dark) { :root { color: #c6add1; } }
   </style>
-  <g fill="none" stroke="currentColor" stroke-width="19" stroke-linejoin="round">
-    <!-- The open ribbon follows the Zeal Z and curls around the terminal prompt. -->
-    <path d="M70 103 29 62Q12 45 29 30Q35 25 46 25H247Q267 25 267 41Q267 49 258 57L90 207H253Q282 207 282 180Q282 153 253 153H185"/>
-    <path d="M72 66H196L42 203Q38 207 44 207H253" stroke-linejoin="miter"/>
-    <path d="m199 172 15 10-15 10m29 0h15" stroke-width="8" stroke-linecap="round"/>
-  </g>
-  <!-- Outlined lettering keeps the logo independent of installed fonts. -->
-  <g fill="none" stroke="currentColor" stroke-width="24" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M344 65H427L344 180H427"/>
-    <path d="M540 65H490C453 65 453 122 490 122H510C549 122 549 180 510 180H464"/>
-    <path d="M580 60V180M580 134C580 98 649 98 649 134V180"/>
-    <path d="M769 172C758 181 746 183 731 180C687 172 688 112 731 112C757 112 772 129 772 147H701"/>
-    <path d="M818 60V180M866 60V180"/>
+  <g fill="currentColor">
+    <!-- Geometric reconstruction of the approved mark: straight ribbon edges,
+         with curves confined to its rounded turns and corners. -->
+    <path d="M17 44C17 31 28 21 42 21H263C277 21 288 32 288 46C288 55 283 62 273 70L215 115H291C319 115 340 138 340 168C340 198 319 220 290 220H46C33 220 24 210 24 197C24 189 28 183 38 175L171 76H95L77 58Q76 57 79 57H220Q224 57 221 60L48 192Q43 196 47 200Q49 202 55 202H290C307 202 322 187 322 169C322 149 308 133 290 133H192L148 167H203Q207 167 207 171V181Q207 185 203 185H100Q96 185 100 182L263 57Q270 52 266 45Q264 40 258 40H42Q35 40 36 47Q36 50 40 54L89 98Q91 100 89 102L81 111Q79 113 77 111L27 67C20 61 17 53 17 44Z"/>
+    <path d="M229 149Q229 142 235 145L260 159Q267 164 260 171L235 185Q229 188 229 181V178Q229 175 232 173L247 165L232 156Q229 154 229 151Z"/>
+    <rect x="270" y="174" width="34" height="12" rx="3"/>
+    <!-- Wordmark contours use exact horizontal/vertical segments and smooth bowls. -->
+    <path d="M412 62H496Q500 62 500 66V79Q500 83 497 86L437 148H493Q497 148 497 152V166Q497 170 493 170H409Q405 170 405 166V154Q405 150 408 147L468 84H412Q408 84 408 80V66Q408 62 412 62Z"/>
+    <path d="M539 62H593Q596 62 596 65V80Q596 83 593 83H541C535 83 532 87 532 94C532 101 536 105 542 105H568C590 105 603 117 603 137C603 158 590 170 568 170H518Q514 170 514 166V153Q514 149 518 149H570C577 149 580 145 580 138C580 130 575 126 568 126H542C521 126 509 115 509 94C509 73 522 62 539 62Z"/>
+    <path d="M612 66Q612 62 616 62H630Q634 62 634 66V95H657C678 95 690 109 690 131V166Q690 170 686 170H672Q668 170 668 166V131C668 120 662 115 651 115H634V166Q634 170 630 170H616Q612 170 612 166Z"/>
+    <path fill-rule="evenodd" d="M739 94H746C769 94 782 108 782 128V135Q782 140 777 140H722C723 148 729 151 740 151H770Q774 151 774 155V166Q774 170 770 170H737C712 170 699 156 699 132C699 108 713 94 739 94ZM721 125H761C761 117 755 112 745 112H737C728 112 723 116 721 125Z"/>
+    <rect x="791" y="62" width="23" height="108" rx="5"/>
+    <rect x="825" y="62" width="23" height="108" rx="5"/>
   </g>
 </svg>

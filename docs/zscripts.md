@@ -154,11 +154,11 @@ The `exit` built-in terminates the shell, not just one nesting level.
 ; Configure programs, select the TF disk, and show a welcome file.
 set PATH=T:/apps/,T:/bin/,A:/,B:/
 cd T:/
-? cat B:/welcome.txt
+? acat B:/welcome.ans
 : echo Could not show the welcome file
 ```
 
-`echo` and `cat` must be installed external programs. Quiet mode suppresses only
+`echo` and `acat` must be installed external programs. Quiet mode suppresses only
 ZShell's `> command` echo; it does not suppress program output, error messages,
 or the `exec` diagnostic. Echoed conditional lines can be displayed even when
 their command is skipped.
