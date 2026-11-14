@@ -6,7 +6,9 @@
     <title>ZShell - Zeal 8-bit Computer</title>
     <link rel="icon" href="/zeal-zshell/favicon.ico">
     <link rel="stylesheet" href="index.css" />
-    <script src="https://zoul0813.github.io/Zeal-NativeEmulator/zeal.elf.js"></script>
+    <script src="zeal.elf.js"></script>
+    <script src="libnative/disk-images.js"></script>
+    <script src="libnative/zeal-native.js"></script>
 </head>
 <body>
     <header>
@@ -16,11 +18,12 @@
         <button id="btn-unmute">Unmute</button>
         <button id="btn-toggle-fps">Toggle FPS</button>
         <button id="btn-clear">Clear Data</button>
-        <button id="btn-save">Save Data</button>
+        <button id="btn-update" hidden>Update Images</button>
         </nav>
     </header>
+    <p id="storage-status" role="status" aria-live="polite"></p>
     <main id="viewport" class="viewport">
-        <h1>Loading ...</h1>
+        <h1 id="loading">Loading ...</h1>
         <canvas id="canvas" class="smooth" tabindex="0" width="640" height="480"></canvas>
         <p class="message">Click to focus on Terminal</p>
     </main>
@@ -41,13 +44,14 @@
             </div>
             <div>
                 <span>Clear Data</span>
-                <p>Delete local eeprom/tf images</p>
+                <p>Delete local disk images and restart with the deployed images</p>
             </div>
             <div>
-                <span>Save Data</span>
-                <p>Save current eeprom/tf images locally</p>
+                <span>Update Images</span>
+                <p>Available when deployed images change. Replaces saved images and restarts the emulator.</p>
             </div>
         </div>
+        <p><a href="https://github.com/zeal8bit/Zeal-Software-Collection">Community TF image download, licenses, and notices</a></p>
     </footer>
     <script src="index.js"></script>
 </body>

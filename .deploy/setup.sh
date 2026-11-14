@@ -1,14 +1,10 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
-SOURCE_PATH="../../../../zeal8bit/Zeal-NativeEmulator/build-wasm-minimal/"
-DEST_PATH="."
-FILES=("zeal.elf.js" "zeal.elf.wasm")
-FULL_FILES=("index.css" "index.html" "index.js" "zeal.elf.js" "zeal.elf.wasm")
+# Copy a matching runtime and its libraries from an OPFS emulator build.
+SOURCE_PATH="${1:?Usage: setup.sh /path/to/Zeal-NativeEmulator/build}"
+DEST_PATH="$(cd "$(dirname "$0")" && pwd)"
 
-# Loop through each file and copy it
-for file in "${FILES[@]}"; do
-    echo "Copying $file..."
-    cp "$SOURCE_PATH$file" "$DEST_PATH/$file"
-done
-
-echo "All files copied successfully!"
+cp "$SOURCE_PATH/zeal.elf.js" "$SOURCE_PATH/zeal.elf.wasm" "$DEST_PATH/"
+mkdir -p "$DEST_PATH/libnative"
+cp "$SOURCE_PATH/libnative/"*.js "$DEST_PATH/libnative/"

@@ -1,2 +1,7 @@
 default.img
 eeprom.img
+tf.img
+zeal.elf.js
+zeal.elf.wasm
+libnative/
+community-image.zip

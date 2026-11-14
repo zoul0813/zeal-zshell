@@ -5,13 +5,20 @@
 :root {
     --focus-timeout: 500ms;
     --focus-time: 200ms;
+    color-scheme: light dark;
+    --paper: light-dark(#f4f6fb, #141923);
+    --ink: light-dark(#202a3b, #e5eaf2);
+    --muted: light-dark(#586579, #a6b2c6);
+    --line: light-dark(#cdd5e3, #344155);
+    --accent: light-dark(#6b5176, #c6add1);
+    --wash: light-dark(#ffffff, #1d2533);
+    --selection: light-dark(#e8dff0, #51405b);
+    --selection-ink: light-dark(#6b5176, #ffffff);
+    --control-border: light-dark(#8993a6, #75839b);
+    --control-hover: light-dark(#e8dff0, #2c3547);
 }
 
 body {
-    --bg: rgba(20, 20, 20, 1);
-    --normal: rgba(220, 220, 220, 1);
-    --error: rgba(220, 128, 128, 1);
-
     /*
     640px min
     98vw - canvas-border - canvas-padding - body-margin
@@ -19,8 +26,8 @@ body {
     */
     /* --max-width: clamp(640px, calc(98vw - 20px - 2ch - 2ch), 1280px); */
 
-    background: var(--bg);
-    color: var(--normal);
+    background: var(--paper);
+    color: var(--ink);
     font-family: 'Courier New', Courier, monospace;
     font-size: 16px;
     line-height: 1.4;
@@ -61,13 +68,14 @@ header {
     button {
         height: 2rem;
         cursor: pointer;
-        color: var(--normal);
-        background: var(--bg);
+        color: var(--ink);
+        background: var(--wash);
+        border: 1px solid var(--control-border);
         white-space: nowrap;
 
         &:hover {
-            background: var(--normal);
-            color: var(--bg);
+            background: var(--control-hover);
+            color: var(--accent);
         }
     }
 
@@ -76,8 +84,8 @@ header {
 .viewport {
     display: grid;
     place-items: center;
-    border: 1px solid var(--error);
-    background-color: #000;
+    border: 1px solid var(--line);
+    background-color: var(--wash);
     padding: 1ch;
     aspect-ratio: 4 / 3;
     transition: border-color var(--focus-time) var(--focus-timeout);
@@ -88,7 +96,7 @@ header {
     }
 
     &:focus-within {
-        border: 1px solid var(--normal);
+        border: 1px solid var(--accent);
         transition: border-color var(--focus-time);
 
         .message {
@@ -118,11 +126,11 @@ header {
     .message {
         text-align: center;
         font-weight: bold;
-        background-color: var(--bg);
+        background-color: var(--paper);
         padding: .75rem 2rem;
         border-radius: 8px;
         font-size: 2rem;
-        color: var(--error);
+        color: var(--accent);
         opacity: 1;
         transition: opacity var(--focus-time) var(--focus-timeout);
     }
@@ -149,4 +157,21 @@ footer {
             }
         }
     }
+}
+a {
+    color: var(--accent);
+}
+
+#storage-status {
+    color: var(--muted);
+}
+
+::selection {
+    background: var(--selection);
+    color: var(--selection-ink);
+}
+
+:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
 }

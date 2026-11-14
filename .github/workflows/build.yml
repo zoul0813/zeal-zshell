@@ -28,6 +28,42 @@ jobs:
         with:
             path: zeal-dev-environment/home/extras/zoul0813/zeal-zshell
 
+      - name: Checkout OPFS emulator
+        uses: actions/checkout@v6
+        with:
+          repository: Zeal8bit/Zeal-NativeEmulator
+          ref: feature/wasm-opfs
+          path: zeal-native-emulator
+
+      - name: Setup Emscripten
+        uses: mymindstorm/setup-emsdk@v16
+        with:
+          version: 7.0.0
+
+      - name: Build OPFS emulator
+        working-directory: zeal-native-emulator
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y meson ninja-build unzip
+          meson setup build --cross-file wasm-cross.build -Dwasm_template=minimal
+          meson compile -C build
+
+      - name: Bundle OPFS emulator
+        run: bash .deploy/setup.sh "$GITHUB_WORKSPACE/zeal-native-emulator/build"
+
+      - name: Download latest 2 MiB community TF image
+        run: |
+          image_dir="$(mktemp -d)"
+          curl --fail --location --retry 3 \
+            --output "$image_dir/tf.zip" \
+            https://github.com/Zeal8bit/Zeal-Software-Collection/releases/latest/download/tf-2mib.img.zip
+          unzip -j "$image_dir/tf.zip" tf-2mib.img tf-2mib.img.sha256 -d "$image_dir"
+          (cd "$image_dir" && sha256sum --check tf-2mib.img.sha256)
+          test "$(stat --format=%s "$image_dir/tf-2mib.img")" -eq 2097152
+          mv "$image_dir/tf-2mib.img" .deploy/tf.img
+          mv "$image_dir/tf.zip" .deploy/community-image.zip
+          rm -r "$image_dir"
+
       - name: Stage coreutils
         run: |
           zde deps stage romdisk coreutils
