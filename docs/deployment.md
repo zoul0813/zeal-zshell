@@ -99,9 +99,9 @@ cd T:/
 acat b:/welcome.ans
 ```
 
-The welcome file is a 78-column, 16-row CP437 banner with a half-block version
-of the approved Z mark beside the welcome text. It fits within the default
-80-column, 40-row display. Use `acat`, which interprets its ANSI color sequences;
+The welcome file is an 80-column, 16-row CP437 banner with a half-block version
+of the approved Z mark beside the welcome text. It spans the full width of
+the default 80-column, 40-row display. Use `acat`, which interprets its ANSI color sequences;
 plain `cat` does not render ANSI. It uses the default 16-color palette's magenta,
 bright magenta, cyan, and gray on black, rather than unsupported true-color
 escape sequences. A custom font must retain CP437 block and box-drawing glyphs.

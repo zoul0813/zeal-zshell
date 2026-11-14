@@ -47,6 +47,15 @@
         updateButton.hidden = true;
     }
 
+    // Receiving a key in WASM does not cancel the browser's scrolling action.
+    // Keep these events available to the runtime; only suppress their defaults.
+    canvas.addEventListener('keydown', event => {
+        if ([' ', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight',
+            'PageUp', 'PageDown', 'Home', 'End'].includes(event.key)) {
+            event.preventDefault();
+        }
+    });
+
     document.getElementById('viewport').addEventListener('click', () => canvas.focus());
     attachButton('btn-reset', () => emulator.reload());
     attachButton('btn-unmute', () => emulator.resumeAudio());

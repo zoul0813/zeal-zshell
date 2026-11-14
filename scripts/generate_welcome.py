@@ -17,8 +17,8 @@ LOGO = (
     '     ▀    ▄██▀ ▄████▄▄▄▄▄▄    ',
     '        ▄██  ▄██████████████▄ ',
     '     ▄▄██▀ ▄██▀            ▀█▄',
-    '   ▄▄██▀ ▄███▀      >_      ██',
-    ' ▄███   ██████████        ▄ ██',
+    '   ▄▄██▀ ▄███▀              ██',
+    ' ▄███   ██████████  >_      ██',
     ' ██▀                      ▄██▀',
     ' ▀█████████████████████████▀  ',
 )
@@ -49,16 +49,16 @@ def color(code):
 
 def generate():
     border = color(35)
-    lines = [border + "╔" + "═" * 76 + "╗"]
+    lines = [border + "╔" + "═" * 78 + "╗"]
     artwork = [" " * 30, *LOGO, " " * 30]
     for logo, (foreground, text) in zip(artwork, WELCOME, strict=True):
-        if len(logo) != 30 or len(text) > 37:
+        if len(logo) != 30 or len(text) > 39:
             raise ValueError("Welcome banner exceeds its column layout")
         lines.append(
             border + "║  " + color(95) + logo + border + "  │  "
-            + color(foreground) + text.ljust(37) + border + "  ║"
+            + color(foreground) + text.ljust(39) + border + "  ║"
         )
-    lines.append(border + "╚" + "═" * 76 + "╝")
+    lines.append(border + "╚" + "═" * 78 + "╝")
     # CRLF keeps both the guest acat renderer and desktop ANSI viewers aligned.
     # Finish in ordinary light gray on black so subsequent output is unaffected.
     return ("\r\n".join(lines) + "\r\n\x1b[0;22;37;40m").encode("cp437")
@@ -67,7 +67,7 @@ def generate():
 def main():
     destination = Path(__file__).resolve().parents[1] / ".deploy/eeprom/welcome.ans"
     destination.write_bytes(generate())
-    print(f"Generated {destination.relative_to(destination.parents[2])} (78 columns × 16 rows)")
+    print(f"Generated {destination.relative_to(destination.parents[2])} (80 columns × 16 rows)")
 
 
 if __name__ == "__main__":
