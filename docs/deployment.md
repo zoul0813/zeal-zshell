@@ -141,5 +141,8 @@ The editable logo source is [`docs/images/logo.svg`](images/logo.svg). README
 uses that file directly; `setup.sh` copies it to `.deploy/logo.svg` for Pages.
 The SVG has path-based lettering, Zeal purple on light backgrounds, and lavender
 on dark backgrounds. The page sizes it in CSS and retains a `+ coreutils` label.
+The [SVG favicon](images/favicon.svg) uses the standalone Z mark and is copied
+to `.deploy/favicon.svg` by the same setup script. It also adapts to light and
+dark browser themes.
 The page palette follows the light/dark colors used by the
 [Zeal Pascal book](https://zoul0813.github.io/zeal-pascal/book/).

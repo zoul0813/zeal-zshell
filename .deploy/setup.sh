@@ -10,3 +10,4 @@ mkdir -p "$DEST_PATH/libnative"
 cp "$SOURCE_PATH/libnative/"*.js "$DEST_PATH/libnative/"
 
 cp "$DEST_PATH/../docs/images/logo.svg" "$DEST_PATH/logo.svg"
+cp "$DEST_PATH/../docs/images/favicon.svg" "$DEST_PATH/favicon.svg"
