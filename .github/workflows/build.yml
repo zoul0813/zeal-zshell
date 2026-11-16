@@ -32,7 +32,6 @@ jobs:
         uses: actions/checkout@v6
         with:
           repository: Zeal8bit/Zeal-NativeEmulator
-          ref: feature/wasm-opfs
           path: zeal-native-emulator
 
       - name: Setup Emscripten
