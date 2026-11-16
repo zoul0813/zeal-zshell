@@ -43,7 +43,8 @@ jobs:
         working-directory: zeal-native-emulator
         run: |
           sudo apt-get update
-          sudo apt-get install -y meson ninja-build unzip
+          sudo apt-get install -y meson ninja-build make unzip
+          python3 tools/build_raylib_web.py
           meson setup build --cross-file wasm-cross.build -Dwasm_template=minimal
           meson compile -C build
 

@@ -66,7 +66,8 @@ intact.
 
 1. Sets up ZDE with the `zealfs` and `zshell` dependencies and checks out ZShell.
 2. Checks out the default branch of `Zeal8bit/Zeal-NativeEmulator`.
-3. Uses Emscripten 7.0.0, Meson, and Ninja to build the minimal WASM template.
+3. Uses Emscripten 7.0.0 and the upstream helper to build Raylib, then Meson and
+   Ninja to build the minimal WASM template.
 4. Copies the matching WASM runtime, browser libraries, and ZShell logo into
    `.deploy` using `setup.sh`.
 5. Downloads the latest published community release's `tf-2mib.img.zip` from
